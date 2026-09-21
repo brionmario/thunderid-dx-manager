@@ -27,7 +27,6 @@ class SdkIndex:
         self.e2e_dirs = spec.get("e2e", [])
         unit_rx = spec.get("units")
         self.unit_rx = re.compile(unit_rx) if unit_rx else None
-        self.layers = spec.get("layers") or {}
         self.spellings = {}
         self.files = self._collect()
         self.texts = {p: p.read_text(encoding="utf-8", errors="replace") for p in self.files}
@@ -98,26 +97,6 @@ class SdkIndex:
             return None
         m = self.unit_rx.search(rel_path)
         return m.group(1) if m else None
-
-    def layer_of(self, unit: str) -> str:
-        for layer, members in self.layers.items():
-            if unit in members:
-                return layer
-        return "Other"
-
-    def units_by_layer(self) -> list:
-        """[(layer, [package, ...])] in the layering order the configuration declares."""
-        known = self.units()
-        out = []
-        for layer, members in self.layers.items():
-            present = [u for u in members if u in known]
-            if present:
-                out.append((layer, present))
-        placed = {u for _, us in out for u in us}
-        rest = [u for u in known if u not in placed]
-        if rest:
-            out.append(("Other", rest))
-        return out
 
     def units(self) -> list:
         """Every package in this SDK, whether or not anything was found in it."""

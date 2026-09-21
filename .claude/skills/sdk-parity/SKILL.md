@@ -59,12 +59,11 @@ implementation parts are crossed.
 ## Columns are repositories
 
 A column covers every package in its repository. *Missing* means absent from all of them,
-and the detail lists every package, grouped by layer, marking the ones that carry the part.
+and the detail lists every package, marking the ones that carry the part.
 
-Read absence against the layer before calling it a gap. A Platform package does not render
-inputs and nothing below Core Lib ships UI, so `node` without `OTP_INPUT` is correct and
-`vue` without it is not. Name the packages: "in react and nuxt, not vue" beats "in the
-JavaScript SDK".
+Not every package is meant to carry every part, so check what a package is for before calling
+an absence a gap: `node` without `OTP_INPUT` is correct, `vue` without it is not. Name the
+packages: "in react and nuxt, not vue" beats "in the JavaScript SDK".
 
 If every E2E cell reads zero, suspect the configuration before the tests: a declared suite
 that indexes no files is reported as a warning at the top of the page and on stderr, and the

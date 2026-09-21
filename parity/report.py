@@ -176,10 +176,7 @@ ul.parts li:last-child{border-bottom:0}
 ul.parts .m{font-weight:700;width:11px;flex:none}
 ul.parts .n{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
 ul.parts .k{color:var(--muted);font-size:11px;white-space:nowrap;flex:none}
-ul.parts .pkrow{display:block;margin:5px 0 1px}
-.pkl{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
-color:var(--muted);margin-top:4px}
-.pkg{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px}
+ul.parts .pkg{display:flex;gap:3px;flex-wrap:wrap;margin-top:4px}
 .pk{font-size:10px;line-height:1.5;padding:0 5px;border-radius:4px;
 border:1px solid var(--grid);color:var(--muted);
 font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
@@ -366,16 +363,12 @@ def _cell(finding):
 
 
 def _package_grid(index, present):
-    """Which packages of a multi-package SDK carry a part, grouped by layer."""
-    rows = []
-    for layer, members in index.units_by_layer():
-        chips = "".join(
-            f'<span class="pk{" on" if u in present else ""}">{_esc(u)}</span>'
-            for u in members
-        )
-        rows.append(f'<span class="pkl">{_esc(layer)}</span>'
-                    f'<span class="pkg">{chips}</span>')
-    return f'<span class="pkrow">{"".join(rows)}</span>'
+    """Which packages of a multi-package SDK carry a part."""
+    chips = "".join(
+        f'<span class="pk{" on" if u in present else ""}">{_esc(u)}</span>'
+        for u in index.units()
+    )
+    return f'<span class="pkg">{chips}</span>'
 
 
 def _parts_list(finding, index=None):
@@ -391,8 +384,9 @@ def _parts_list(finding, index=None):
         where = ({u for e in part.evidence
                   if (u := index.unit_of(e.rsplit(":", 1)[0]))} if units else set())
         if units:
-            # Every package listed, present or not. A package is only expected to carry
-            # what its layer implies, so absence is drawn as absence and not as a fault.
+            # Every package listed, present or not, with the ones that carry it marked.
+            # Absence is drawn as absence rather than as a fault: not every package is
+            # meant to carry every part.
             ev = _package_grid(index, where)
         elif part.found:
             ev = "".join(f'<span class="ev">{_esc(e)}</span>' for e in part.evidence[:2])
@@ -737,13 +731,12 @@ question, because it closes a gap nobody then looks at.</p>
 <h3>Columns are repositories</h3>
 <p>Each column covers every package in its repository: JavaScript is eleven, Apple and
 Android two each. A cell reads missing only when nothing in any of them has it. Expanding a
-row breaks every part down package by package, grouped by the layer each package sits at,
-so divergence inside one repository is visible: a capability in react and not in vue is as
-real a gap as one in JavaScript and not in Swift.</p>
-<p>Packages are listed whether or not they carry the part, because absence has to be read
-against the layer. No Platform package renders an input and nothing below Core Lib ships UI,
-so <code>browser</code> lacking <code>CONSENT_INPUT</code> is the architecture working,
-while <code>vue</code> lacking it is a gap. The report shows where a thing is and leaves
+row breaks every part down package by package, so divergence inside one repository is
+visible: a capability in react and not in vue is as real a gap as one in JavaScript and not
+in Swift.</p>
+<p>Every package is listed, with the ones carrying the part marked. The rest are drawn
+plainly rather than as faults, because not every package is meant to carry every part and
+the report cannot tell which absences are deliberate. It shows where a thing is and leaves
 that judgement to you.</p>
 
 <h3>End-to-end coverage</h3>

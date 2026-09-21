@@ -64,17 +64,11 @@ SDK can render an input that nothing ever exercises.
 Each SDK column covers every package in its repository: JavaScript is eleven, Apple and
 Android two each. A cell reads *Missing* only when nothing in any of them has it.
 
-The detail view breaks every part down package by package, grouped by the layer each package
-sits at, so divergence inside one repository is visible: a capability in react and not in vue
-is as real a gap as one in JavaScript and not in Swift. Packages are listed whether or not
-they carry the part, because absence has to be read against the layer. No Platform package
-renders an input and nothing below Core Lib ships UI, so `browser` lacking `CONSENT_INPUT` is
-the architecture working, while `vue` lacking it is a gap. Present packages are marked;
-absent ones are drawn plainly rather than as faults, and the report does not pretend to know
-which is which.
-
-The layer for each package comes from the specification's architecture section and is
-declared in `parity.config.yaml` under `layers`.
+The detail view breaks every part down package by package, so divergence inside one
+repository is visible: a capability in react and not in vue is as real a gap as one in
+JavaScript and not in Swift. Every package is listed, with the ones carrying the part marked;
+the rest are drawn plainly rather than as faults, because not every package is meant to carry
+every part and the report does not pretend to know which absences are deliberate.
 
 ## Verdicts
 

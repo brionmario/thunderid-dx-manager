@@ -26,19 +26,8 @@ sdks:
     path: /Users/brion/Desktop/thunderid/thunderid-sdk-components/sdks/javascript-sdks
     globs: ["*.ts", "*.tsx"]
     # A JavaScript "SDK" is eleven published packages. Without this the column answers
-    # "somewhere in the repo", which hides the case the layering makes likely: react has
-    # it and vue does not.
+    # "somewhere in the repo", which hides the case that matters: react has it, vue does not.
     units: 'packages/([^/]+)/'
-    # Layers, from the specification's architecture section. A package is only expected to
-    # carry what its layer implies: no Platform package renders an input, and nothing below
-    # Core Lib ships UI. The breakdown groups by layer so absence can be read correctly
-    # rather than counted as eleven gaps.
-    layers:
-      Agnostic: [javascript]
-      Platform: [browser, node]
-      Core Lib: [react, vue]
-      Framework Specific: [nextjs, nuxt, react-router, tanstack-router, express]
-      Integration: [better-auth]
     exclude: ["node_modules", "/dist/", "/build/", "__tests__", ".test.", ".spec.", "/docs/"]
     e2e: ["tests/e2e"]
     # The JavaScript surface is spread across the Agnostic, Platform and Framework
@@ -57,9 +46,6 @@ sdks:
     path: /Users/brion/Desktop/thunderid/thunderid-sdk-components/sdks/ios
     globs: ["*.swift"]
     units: 'Sources/([^/]+)/'
-    layers:
-      Agnostic and Platform: [ThunderID]
-      Core Lib: [ThunderIDSwiftUI]
     exclude: ["/Tests/", "/.build/", "Samples/", "/Pods/"]
     e2e: ["Tests/e2e"]
     client: Sources/ThunderID/ThunderIDClient.swift
@@ -71,9 +57,6 @@ sdks:
     path: /Users/brion/Desktop/thunderid/thunderid-sdk-components/sdks/android
     globs: ["*.kt"]
     units: 'kotlin/dev/thunderid/([^/]+)/'
-    layers:
-      Agnostic and Platform: [android]
-      Core Lib: [compose]
     exclude: ["/test/", "/androidTest/", "/build/", "samples/"]
     e2e: ["tests/e2e"]
     client: src/main/kotlin/dev/thunderid/android/ThunderIDClient.kt
