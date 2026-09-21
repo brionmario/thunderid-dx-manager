@@ -1,0 +1,104 @@
+# Human judgement that the extractors cannot make for themselves.
+#
+# Everything else in this report is derived from source on every run. This file is only for
+# the three things derivation cannot settle:
+#
+#   aliases  a capability an SDK implements under a different spelling
+#   na       a capability that genuinely cannot apply on a platform, with the reason
+#   detect   an extra detector for a capability with no wire literal to search for
+#
+# Keys are "<axis>:<capability>". An entry for a capability that no longer exists is
+# reported as a stale override rather than ignored, so this file cannot quietly rot.
+
+overrides:
+
+  # --- Client surface -------------------------------------------------------------
+  # The specification names the pair `setSession, clearSession`. Platforms that expose only
+  # a cache-write under a different name are recorded here rather than scored as missing.
+  surface:setSession:
+    aliases: [setCachedUser, setSessionState, cacheSession]
+
+  surface:isLoading:
+    aliases: [isLoadingState, loading]
+
+  # --- Executors ------------------------------------------------------------------
+  # Executors that build their prompts at runtime, so no input list can be read from Go.
+  # A detector names something the SDK must contain to drive the executor at all.
+  executor:OAuthExecutor:
+    detect:
+      any_identifier: [code, state]
+    note: >
+      Federated redirect. An SDK drives it by handing the user to an external URL and
+      returning with an authorization code.
+
+  executor:OIDCAuthExecutor:
+    detect:
+      any_identifier: [code, state]
+    note: Same redirect mechanism as OAuthExecutor, with an ID token on return.
+
+  executor:GithubOAuthExecutor:
+    detect:
+      any_identifier: [code, state]
+    note: Inherits the OAuth redirect mechanism.
+
+  executor:OpenID4VPVerifyExecutor:
+    detect:
+      any_literal: [QR_CODE, openid4vp, OpenID4VP]
+    note: >
+      Wallet presentation. The client shows a QR code or deep link and polls, so an SDK
+      without QR_CODE rendering cannot complete the flow.
+
+  executor:IdentifyingExecutor:
+    detect:
+      any_literal: [SELECT]
+    note: Prompts the user to choose among matched identifiers.
+
+  executor:FederatedAuthResolverExecutor:
+    detect:
+      any_identifier: [idpName, idpId]
+    note: Resolves which federated provider to hand off to.
+
+  # Executors that reach the client only as a generic prompt already covered by the input
+  # and element axes. Scoring them per SDK would double-count the same evidence.
+  executor:ApplicationActionValidator:
+    informational: true
+    note: Surfaces as a generic error or confirmation prompt; no distinct SDK surface.
+  executor:AttributeUniquenessValidator:
+    informational: true
+    note: Re-prompts an already-rendered attribute field; no distinct SDK surface.
+  executor:PreDeleteExecutor:
+    informational: true
+    note: Confirmation prompt built from generic elements.
+  executor:ProvisioningExecutor:
+    informational: true
+    note: Prompts only to re-collect attributes already covered by the input axis.
+  executor:SessionSignOutExecutor:
+    informational: true
+    note: Confirmation prompt built from generic elements.
+  executor:AttributeCollector:
+    informational: true
+    note: >
+      Collects arbitrary profile attributes; the concrete prompt is whatever input types
+      the attribute schema names, which the input axis already scores.
+
+  # --- Elements -------------------------------------------------------------------
+  element:CAPTCHA:
+    na:
+      ios: No bundled captcha widget on Apple platforms; flows using it fall back to redirect mode.
+      android: No bundled captcha widget; flows using it fall back to redirect mode.
+      flutter: No bundled captcha widget; flows using it fall back to redirect mode.
+
+  # --- Configuration --------------------------------------------------------------
+  config:components:
+    na:
+      ios: "Specification: SDKs without bundled UI MAY omit presentation keys."
+      android: "Specification: SDKs without bundled UI MAY omit presentation keys."
+  config:extensions:
+    na:
+      ios: "Specification: SDKs without bundled UI MAY omit presentation keys."
+      android: "Specification: SDKs without bundled UI MAY omit presentation keys."
+  config:syncSession:
+    na:
+      ios: Browser-cookie session synchronization has no meaning on a native platform.
+      android: Browser-cookie session synchronization has no meaning on a native platform.
+      flutter: Browser-cookie session synchronization has no meaning on a native platform.

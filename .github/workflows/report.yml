@@ -1,0 +1,103 @@
+# Regenerates the SDK parity report and publishes it to GitHub Pages.
+#
+# The report is only as current as the checkouts it reads, so it is rebuilt on a schedule
+# rather than committed: a capability added to the server yesterday should show up as a
+# gap today without anyone here doing anything.
+#
+# The sources are read at their default branch. Nothing from them is executed - they are
+# parsed as text - so a scheduled run never runs code from another repository.
+
+name: Parity report
+
+on:
+  schedule:
+    - cron: "0 6 * * *"   # daily, 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      product_ref:
+        description: Branch or tag of the product repository to measure
+        default: main
+  push:
+    branches: [main]
+    paths:
+      - "parity/**"
+      - "catalogue/**"
+      - "parity.ci.yaml"
+      - ".github/workflows/report.yml"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# A later run should win, but never interrupt a publish that is already in flight.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the product
+        uses: actions/checkout@v4
+        with:
+          repository: thunder-id/thunderid
+          ref: ${{ inputs.product_ref || 'main' }}
+          path: sources/thunderid
+          token: ${{ secrets.SOURCES_TOKEN || github.token }}
+
+      - name: Check out the JavaScript SDKs
+        uses: actions/checkout@v4
+        with:
+          repository: thunder-id/javascript-sdks
+          path: sources/javascript-sdks
+          token: ${{ secrets.SOURCES_TOKEN || github.token }}
+
+      - name: Check out the iOS SDKs
+        uses: actions/checkout@v4
+        with:
+          repository: thunder-id/ios-sdks
+          path: sources/ios-sdks
+          token: ${{ secrets.SOURCES_TOKEN || github.token }}
+
+      - name: Check out the Android SDKs
+        uses: actions/checkout@v4
+        with:
+          repository: thunder-id/android-sdks
+          path: sources/android-sdks
+          token: ${{ secrets.SOURCES_TOKEN || github.token }}
+
+      - name: Check out the Flutter SDKs
+        uses: actions/checkout@v4
+        with:
+          repository: thunder-id/flutter-sdks
+          path: sources/flutter-sdks
+          token: ${{ secrets.SOURCES_TOKEN || github.token }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install -r requirements.txt
+
+      - name: Generate the report
+        run: |
+          python3 -m parity --config parity.ci.yaml \
+            --html out/index.html --json out/parity.json
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
