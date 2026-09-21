@@ -32,6 +32,13 @@ embedding so `GithubOAuthExecutor` inherits the verdict from the OAuth executor 
 The other executors are carried in the report marked *not applicable*, so you can see that
 they were considered.
 
+## Theme
+
+The report follows the operating system by default. The masthead carries an Auto / Light /
+Dark control that overrides it in either direction, remembered per browser. The choice is
+stamped on the page before it paints, so switching does not flash the other theme first, and
+a browser that blocks site data simply falls back to the system setting.
+
 ## The detail view
 
 Select any row in the report to expand it. A verdict on its own cannot be acted on, so the

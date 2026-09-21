@@ -48,6 +48,12 @@ justify-content:space-between;flex-wrap:wrap}
 .mh-meta dd{margin:2px 0 0;font-size:12px;color:var(--ink2);
 font-variant-numeric:tabular-nums;white-space:nowrap}
 .mh-meta code{font-size:12px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden}
+.seg button{font:inherit;font-size:11px;line-height:1;padding:4px 8px;border:0;cursor:pointer;
+background:transparent;color:var(--ink2);border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.seg button:hover{background:var(--plane);color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--plane);color:var(--ink);font-weight:600}
 .how{margin:0 0 16px;font-size:13px}
 .how summary{cursor:pointer;color:var(--ink2);width:fit-content;
 list-style:none;display:inline-flex;align-items:center;gap:6px}
@@ -175,6 +181,31 @@ a{color:inherit}
 """
 
 JS = """
+// Theme: auto follows the operating system, light and dark override it in both
+// directions. The stamp on <html> is what the stylesheet keys off.
+(function(){
+  var root=document.documentElement, KEY='parity-theme';
+  function read(){
+    try { var v=localStorage.getItem(KEY); return v==='light'||v==='dark'?v:'auto'; }
+    catch(e){ return 'auto'; }
+  }
+  function apply(mode){
+    if(mode==='auto') delete root.dataset.theme; else root.dataset.theme=mode;
+    document.querySelectorAll('[data-set-theme]').forEach(function(b){
+      b.setAttribute('aria-pressed', String(b.dataset.setTheme===mode));
+    });
+  }
+  document.querySelectorAll('[data-set-theme]').forEach(function(b){
+    b.addEventListener('click',function(){
+      var mode=b.dataset.setTheme;
+      try { mode==='auto'?localStorage.removeItem(KEY):localStorage.setItem(KEY,mode); }
+      catch(e){}
+      apply(mode);
+    });
+  });
+  apply(read());
+})();
+
 const q=document.getElementById('q'),ax=document.getElementById('ax'),
 show=document.getElementById('show');
 function apply(){
@@ -490,7 +521,18 @@ def render(result) -> str:
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ThunderID SDK Parity</title>
-<style>{CSS}</style></head>
+<style>{CSS}</style>
+<script>
+// Runs before the body paints, so a stored choice does not flash the other theme first.
+// Storage can be unavailable or throw (private window, blocked site data), and the page
+// is correct without it: no stamp means the OS setting decides.
+(function(){{
+  try {{
+    var t = localStorage.getItem('parity-theme');
+    if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+  }} catch (e) {{}}
+}})();
+</script></head>
 <body>
 <header class="masthead"><div class="wrap mh">
   <div class="mh-id">
@@ -502,6 +544,11 @@ def render(result) -> str:
       {_esc(result['product']['branch'])}</dd></div>
     <div><dt>Capabilities</dt><dd>{len(scored)} scored</dd></div>
     <div><dt>Generated</dt><dd>{_esc(result['generated'])}</dd></div>
+    <div><dt>Theme</dt><dd><span class="seg" role="group" aria-label="Colour theme">
+      <button type="button" data-set-theme="auto">Auto</button
+      ><button type="button" data-set-theme="light">Light</button
+      ><button type="button" data-set-theme="dark">Dark</button>
+    </span></dd></div>
   </dl>
 </div></header>
 
