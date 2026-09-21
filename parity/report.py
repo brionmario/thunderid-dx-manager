@@ -23,14 +23,30 @@ STATUS = OrderedDict([
     (NOT_APPLICABLE, {"glyph": "–", "label": "Not applicable", "color": "#898781"}),
 ])
 
+# The ThunderID mark, from skills/assets/images/brand/logo-mini.svg. Inlined so the report
+# remains one self-contained file, with the one path that differs between the light and
+# inverted variants driven by a custom property instead of shipping both.
+LOGO = """<svg class="mark" viewBox="0 0 207 257" role="img" aria-label="ThunderID"
+  xmlns="http://www.w3.org/2000/svg" fill="none">
+  <path d="M55.4763 26.4391L58.8866 0H0V26.4391H55.4763Z" fill="var(--logo-ink)"/>
+  <path d="M39.8438 147.407L49.5455 72.2839H4.9909e-05V256.743H60.5602L80.048 147.407H39.8438Z"
+    fill="#3688FF"/>
+  <path d="M192.42 59.361C182.782 40.2307 168.929 25.5705 150.903 15.3381C145.501 12.2662
+    139.761 9.6605 133.703 7.5208L115.401 103.702H159.757L76.2987 256.743H83.3735C109.449
+    256.743 131.69 251.574 150.14 241.236C168.569 230.897 182.634 216.131 192.356
+    196.959C202.058 177.765 206.909 154.8 206.909 128.043C206.909 101.286 202.079 78.5123
+    192.441 59.3821L192.42 59.361Z" fill="#3688FF"/>
+</svg>"""
+
 CSS = """
-:root{color-scheme:light;--surface:#fcfcfb;--plane:#f9f9f7;--ink:#0b0b0b;--ink2:#52514e;
+:root{color-scheme:light;--logo-ink:#05213f;--surface:#fcfcfb;--plane:#f9f9f7;--ink:#0b0b0b;--ink2:#52514e;
 --muted:#898781;--grid:#e1e0d9;--rule:#c3c2b7;--ring:rgba(11,11,11,.10);
 --good:#0ca30c;--warn:#fab219;--serious:#ec835a;--crit:#d03b3b;}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;
+--logo-ink:#ffffff;
 --surface:#1a1a19;--plane:#0d0d0d;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;
 --grid:#2c2c2a;--rule:#383835;--ring:rgba(255,255,255,.10);}}
-:root[data-theme="dark"]{color-scheme:dark;--surface:#1a1a19;--plane:#0d0d0d;--ink:#fff;
+:root[data-theme="dark"]{color-scheme:dark;--logo-ink:#ffffff;--surface:#1a1a19;--plane:#0d0d0d;--ink:#fff;
 --ink2:#c3c2b7;--muted:#898781;--grid:#2c2c2a;--rule:#383835;--ring:rgba(255,255,255,.10);}
 *{box-sizing:border-box}
 body{margin:0;background:var(--plane);color:var(--ink);
@@ -39,15 +55,12 @@ padding:0 16px env(safe-area-inset-bottom,0px);}
 .wrap{max-width:1180px;margin:0 auto;padding-block:28px}
 .masthead{background:var(--surface);border-bottom:1px solid var(--rule);
 margin:0 -16px 20px;padding:0 16px;padding-top:env(safe-area-inset-top,0px)}
-.mh{padding-block:20px;display:flex;gap:20px 32px;align-items:flex-end;
+.mh{padding-block:14px;display:flex;gap:12px 24px;align-items:center;
 justify-content:space-between;flex-wrap:wrap}
-.mh-id h1{font-size:20px;margin:0}
-.mh-id p{margin:3px 0 0;color:var(--ink2);max-width:58ch}
-.mh-meta{display:flex;gap:26px;margin:0;flex-wrap:wrap}
-.mh-meta dt{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
-.mh-meta dd{margin:2px 0 0;font-size:12px;color:var(--ink2);
-font-variant-numeric:tabular-nums;white-space:nowrap}
-.mh-meta code{font-size:12px}
+.brand{display:flex;align-items:center;gap:10px;margin:0;font-size:17px;font-weight:400;
+letter-spacing:-.01em;color:var(--ink2)}
+.brand b{font-weight:600;color:var(--ink)}
+.brand .mark{height:26px;width:auto;flex:none;display:block}
 .seg{display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden}
 .seg button{font:inherit;font-size:11px;line-height:1;padding:4px 8px;border:0;cursor:pointer;
 background:transparent;color:var(--ink2);border-right:1px solid var(--rule)}
@@ -520,7 +533,9 @@ def render(result) -> str:
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ThunderID SDK Parity</title>
+<title>ThunderID DX Dashboard</title>
+<!-- The mark, all-blue so it reads on a light or a dark browser tab. -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20207%20257%22%3E%3Cpath%20d%3D%22M55.4763%2026.4391L58.8866%200H0V26.4391H55.4763Z%22%20fill%3D%22%233688FF%22%2F%3E%3Cpath%20d%3D%22M39.8438%20147.407L49.5455%2072.2839H0V256.743H60.5602L80.048%20147.407H39.8438Z%22%20fill%3D%22%233688FF%22%2F%3E%3Cpath%20d%3D%22M192.42%2059.361C182.782%2040.2307%20168.929%2025.5705%20150.903%2015.3381C145.501%2012.2662%20139.761%209.6605%20133.703%207.5208L115.401%20103.702H159.757L76.2987%20256.743H83.3735C109.449%20256.743%20131.69%20251.574%20150.14%20241.236C168.569%20230.897%20182.634%20216.131%20192.356%20196.959C202.058%20177.765%20206.909%20154.8%20206.909%20128.043C206.909%20101.286%20202.079%2078.5123%20192.441%2059.3821L192.42%2059.361Z%22%20fill%3D%22%233688FF%22%2F%3E%3C%2Fsvg%3E">
 <style>{CSS}</style>
 <script>
 // Runs before the body paints, so a stored choice does not flash the other theme first.
@@ -535,21 +550,12 @@ def render(result) -> str:
 </script></head>
 <body>
 <header class="masthead"><div class="wrap mh">
-  <div class="mh-id">
-    <h1>ThunderID SDK parity</h1>
-    <p>Every capability the product can ask of an SDK, and whether each SDK answers.</p>
-  </div>
-  <dl class="mh-meta">
-    <div><dt>Product</dt><dd><code>{_esc(result['product']['commit'])}</code>
-      {_esc(result['product']['branch'])}</dd></div>
-    <div><dt>Capabilities</dt><dd>{len(scored)} scored</dd></div>
-    <div><dt>Generated</dt><dd>{_esc(result['generated'])}</dd></div>
-    <div><dt>Theme</dt><dd><span class="seg" role="group" aria-label="Colour theme">
-      <button type="button" data-set-theme="auto">Auto</button
-      ><button type="button" data-set-theme="light">Light</button
-      ><button type="button" data-set-theme="dark">Dark</button>
-    </span></dd></div>
-  </dl>
+  <h1 class="brand">{LOGO}<span>ThunderID <b>DX Dashboard</b></span></h1>
+  <span class="seg" role="group" aria-label="Colour theme">
+    <button type="button" data-set-theme="auto">Auto</button
+    ><button type="button" data-set-theme="light">Light</button
+    ><button type="button" data-set-theme="dark">Dark</button>
+  </span>
 </div></header>
 
 <div class="wrap" style="padding-top:0">
@@ -581,7 +587,9 @@ def render(result) -> str:
 {sections}
 
 <footer>
-Measured against {prov}.<br>
+{len(scored)} capabilities scored, generated {_esc(result['generated'])}.<br>
+Product <code>{_esc(result['product']['commit'])}</code> on
+<code>{_esc(result['product']['branch'])}</code> &middot; measured against {prov}.<br>
 Each row cites the file and line it was discovered from; select a row for the evidence
 behind every cell.
 </footer>
