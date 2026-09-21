@@ -83,7 +83,8 @@ python3 -m parity --fail-on-gap        # non-zero exit when something has no SDK
 ## When a new capability appears
 
 Add an executor, an input type, or a row in a specification table, and it turns up on the
-next run on its own. Three things then want a human:
+next run on its own. The counts above the tables are filters, so each of these is one click
+rather than a hunt. Three things want a human:
 
 - **Supported by no SDK.** Either the SDKs have not caught up, or the capability is not
   meant to reach a client. If the latter, the executor should not be emitting a

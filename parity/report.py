@@ -123,6 +123,15 @@ font-variant-numeric:tabular-nums;word-break:break-all}
 .tsec li{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;
 word-break:break-all;padding:1px 0}
 .tsec .none{color:var(--crit)}
+.summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
+.chip{display:inline-flex;align-items:baseline;gap:5px;font-size:12px;color:var(--ink2);
+background:var(--surface);border:1px solid var(--ring);border-radius:999px;padding:5px 11px}
+.chip b{font-size:13px;font-variant-numeric:tabular-nums;color:inherit}
+a.chip.is-link{text-decoration:none;cursor:pointer}
+a.chip.is-link:hover{border-color:var(--rule);background:var(--plane)}
+.chip.muted{color:var(--muted);border-style:dashed}
+.stale{margin:-6px 0 14px;font-size:12px;color:var(--ink2)}
+.stale code{font-size:11px}
 ul.alert{margin:0;padding-left:20px}
 ul.alert li{margin:3px 0}
 ul.alert code{font-size:12px}
@@ -136,15 +145,18 @@ a{color:inherit}
 
 JS = """
 const q=document.getElementById('q'),ax=document.getElementById('ax'),
-gapsOnly=document.getElementById('gapsOnly');
+show=document.getElementById('show');
 function apply(){
-  const term=q.value.trim().toLowerCase(), axis=ax.value, only=gapsOnly.checked;
+  const term=q.value.trim().toLowerCase(), axis=ax.value, mode=show.value;
   document.querySelectorAll('section[data-axis]').forEach(sec=>{
     let shown=0;
     sec.querySelectorAll('tbody tr[data-name]').forEach(tr=>{
       const okAxis = axis==='all' || sec.dataset.axis===axis;
       const okTerm = !term || tr.dataset.name.includes(term);
-      const okGap  = !only || tr.dataset.gap==='1';
+      const okGap  = mode==='all'
+                  || (mode==='gaps'     && tr.dataset.gap==='1')
+                  || (mode==='orphan'   && tr.dataset.orphan==='1')
+                  || (mode==='unknown'  && tr.dataset.unknown==='1');
       const vis = okAxis && okTerm && okGap;
       tr.hidden=!vis; if(vis) shown++;
       const d=document.getElementById(tr.dataset.detail);
@@ -163,7 +175,18 @@ function apply(){
     const e=sec.querySelector('.empty'); if(e) e.hidden = shown!==0;
   });
 }
-[q,ax,gapsOnly].forEach(el=>el.addEventListener('input',apply));
+[q,ax,show].forEach(el=>el.addEventListener('input',apply));
+
+// The counts in the summary line are filters, not decoration: the interesting subsets are
+// reachable without a wall of red above the data.
+document.querySelectorAll('[data-show]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    e.preventDefault();
+    show.value=a.dataset.show; ax.value='all'; q.value='';
+    apply();
+    document.querySelector('.controls').scrollIntoView({block:'start',behavior:'smooth'});
+  });
+});
 
 // Rows expand in place rather than opening a panel, so several can be compared at once
 // and a filtered view keeps its shape.
@@ -313,6 +336,9 @@ def _matrix(axis, title, rows, sdks):
             detail += "  Inputs: " + ", ".join(f"{i} ({t})" for i, t in cap.inputs)
         cells = "".join(_cell(r.findings[s["id"]]) for s in sdks)
         detail_id = f"d-{axis}-{abs(hash(cap.uid)) % 10**9}"
+        scoredrow = getattr(r, "scored", True)
+        orphan = scoredrow and r.is_total_gap
+        unknown = scoredrow and all(f.status == UNDETERMINED for f in r.findings.values())
         tested = sum(1 for s in sdks if r.findings[s["id"]].tests)
         scored_n = sum(1 for s in sdks if r.findings[s["id"]].status != NOT_APPLICABLE)
         tint = (STATUS[SUPPORTED]["color"] if tested and tested >= scored_n
@@ -324,7 +350,8 @@ def _matrix(axis, title, rows, sdks):
         body.append(
             f'<tr class="row" tabindex="0" role="button" aria-expanded="false" '
             f'aria-controls="{detail_id}" data-detail="{detail_id}" '
-            f'data-name="{_esc(cap.name.lower())}" data-gap="{1 if r.is_gap else 0}">'
+            f'data-name="{_esc(cap.name.lower())}" data-gap="{1 if r.is_gap else 0}" '
+            f'data-orphan="{1 if orphan else 0}" data-unknown="{1 if unknown else 0}">'
             f'<td class="cap" title="{_esc(detail)}">'
             f'<span class="tw"><span class="caret" aria-hidden="true">&#9654;</span>'
             f'<b>{_esc(cap.name)}</b></span>'
@@ -351,47 +378,39 @@ def _matrix(axis, title, rows, sdks):
 </section>"""
 
 
-def _alerts(rows, stale):
-    items = []
+def _summary(rows, stale, scored):
+    """One line of counts, each one a filter on the tables below.
 
-    orphans = [r for r in rows if getattr(r, "scored", True) and r.is_total_gap]
-    if orphans:
-        items.append((
-            "Supported by no SDK",
-            "The product can emit these and not one SDK handles them. A flow that uses one "
-            "breaks everywhere.",
-            [f"<code>{_esc(r.capability.name)}</code> "
-             f"<span style='color:var(--muted)'>{_esc(r.capability.origin)}</span>"
-             for r in orphans],
-        ))
-
+    The counts used to be a card of their own above the data, which pushed the tables off
+    the screen and made the worst case the first thing read every time. The signal is the
+    same; what changed is that reaching it is a click rather than a scroll past it.
+    """
+    orphan = [r for r in rows if getattr(r, "scored", True) and r.is_total_gap]
     unknown = [r for r in rows
                if getattr(r, "scored", True)
                and all(f.status == UNDETERMINED for f in r.findings.values())]
-    if unknown:
-        items.append((
-            "No detector yet",
-            "Discovered in the product, but nothing here can prove whether an SDK handles it. "
-            "Add a detector in catalogue/overrides.yaml to turn each into a real verdict.",
-            [f"<code>{_esc(r.capability.name)}</code>" for r in unknown],
-        ))
+    gaps = [r for r in scored if r.is_gap]
 
+    def chip(n, label, mode, tone=""):
+        if not n:
+            return (f'<span class="chip"><b>0</b> {label}</span>')
+        style = f' style="color:{tone}"' if tone else ""
+        return (f'<a class="chip is-link" href="#" data-show="{mode}"{style}>'
+                f'<b>{n}</b> {label}</a>')
+
+    bits = [
+        chip(len(gaps), "short in at least one SDK", "gaps"),
+        chip(len(orphan), "supported by no SDK", "orphan", STATUS[MISSING]["color"]),
+        chip(len(unknown), "with no detector yet", "unknown", STATUS[UNDETERMINED]["color"]),
+    ]
+    stale_note = ""
     if stale:
-        items.append((
-            "Stale overrides",
-            "These name a capability that no longer exists upstream. Remove them, or find out "
-            "what replaced it.",
-            [f"<code>{_esc(k)}</code>" for k in stale],
-        ))
-
-    if not items:
-        return ""
-    blocks = "".join(
-        f'<div class="pad"><h2>{_esc(t)}</h2><p class="sub" style="margin:4px 0 8px">{_esc(d)}</p>'
-        f'<ul class="alert">{"".join(f"<li>{x}</li>" for x in xs)}</ul></div>'
-        for t, d, xs in items
-    )
-    return f'<section class="card" style="border-color:#d03b3b40">{blocks}</section>'
+        names = ", ".join(f"<code>{_esc(k)}</code>" for k in stale)
+        stale_note = (f'<p class="stale">{len(stale)} stale override'
+                      f'{"s" if len(stale) != 1 else ""} naming a capability that no longer '
+                      f'exists upstream: {names}</p>')
+    return (f'<div class="summary">{"".join(bits)}'
+            f'<span class="chip muted">{len(scored)} scored</span></div>{stale_note}')
 
 
 def render(result) -> str:
@@ -417,17 +436,22 @@ def render(result) -> str:
 <h1>ThunderID SDK parity</h1>
 <p class="sub">Every capability the product can ask of an SDK, and whether each SDK answers.
 Discovered from source on each run: executors and wire constants from the server, the element
-palette from the console, the client surface and configuration keys from the SDK specification.
-<b>{total_gaps}</b> of {len(scored)} capabilities are short in at least one SDK.</p>
+palette from the console, the client surface and configuration keys from the SDK
+specification. Select any row for the evidence behind every cell.</p>
 
 <div class="tiles" style="margin-bottom:18px">{tiles}</div>
 
-{_alerts(rows, result["stale_overrides"])}
+{_summary(rows, result["stale_overrides"], scored)}
 
 <div class="controls">
   <input type="search" id="q" placeholder="Filter capabilities&hellip;" aria-label="Filter capabilities">
   <select id="ax" aria-label="Axis"><option value="all">All axes</option>{axis_opts}</select>
-  <label class="chk"><input type="checkbox" id="gapsOnly"> Gaps only</label>
+  <select id="show" aria-label="Show">
+    <option value="all">All capabilities</option>
+    <option value="gaps">Gaps only</option>
+    <option value="orphan">Supported by no SDK</option>
+    <option value="unknown">No detector yet</option>
+  </select>
 </div>
 
 {sections}

@@ -22,6 +22,10 @@ HTML when you need the data.
 If a checkout is missing, the run stops and names the path. Fix `parity.config.yaml`; do
 not comment an SDK out, because a dropped column reads as "no gaps here".
 
+The counts above the tables filter them: *short in at least one SDK*, *supported by no
+SDK*, *with no detector yet*. In `out/parity.json` the same subsets are a capability whose
+`sdks` values are all `missing`, and one whose values are all `unknown`.
+
 ## Triage, in this order
 
 1. **Supported by no SDK.** The product can emit it and nothing handles it. Decide which:
