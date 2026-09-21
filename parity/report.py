@@ -119,23 +119,28 @@ tr.detail>td{background:var(--plane);padding:0}
 .dwrap{padding:14px 16px;border-left:3px solid var(--rule)}
 .dmeta{color:var(--ink2);margin:0 0 12px;max-width:80ch}
 .dmeta code{font-size:11px;color:var(--muted)}
-.psuite{display:block;margin-top:9px;padding-top:9px;border-top:1px solid var(--grid);font-size:12px}
-.psuite b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
-.psuite ul{list-style:none;margin:5px 0 0;padding:0}
-.psuite li{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;word-break:break-all}
 .dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
 .dcard{background:var(--surface);border:1px solid var(--ring);border-radius:9px;padding:12px}
 .dcard h4{margin:0 0 8px;font-size:13px;display:flex;align-items:center;
 justify-content:space-between;gap:8px}
 .dcard .why{color:var(--ink2);font-size:12px;margin:0 0 9px}
 ul.parts{list-style:none;margin:0 0 9px;padding:0;font-size:12px}
-ul.parts li{display:flex;gap:7px;align-items:baseline;padding:2px 0;
+ul.parts li{display:flex;gap:7px;align-items:flex-start;padding:4px 0;
 border-bottom:1px solid var(--grid)}
+.pbody{flex:1;min-width:0}
+.prow{display:flex;gap:8px;align-items:baseline;justify-content:space-between}
 ul.parts li:last-child{border-bottom:0}
 ul.parts .m{font-weight:700;width:11px;flex:none}
 ul.parts .n{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
-ul.parts .k{color:var(--muted);font-size:11px;margin-left:auto;white-space:nowrap}
-ul.parts .ev.units{color:var(--ink2);font-family:inherit;font-size:11px}
+ul.parts .k{color:var(--muted);font-size:11px;white-space:nowrap;flex:none}
+ul.parts .pkrow{display:block;margin:5px 0 1px}
+.pkl{display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.05em;
+color:var(--muted);margin-top:4px}
+.pkg{display:flex;gap:3px;flex-wrap:wrap;margin-top:2px}
+.pk{font-size:10px;line-height:1.5;padding:0 5px;border-radius:4px;
+border:1px solid var(--grid);color:var(--muted);
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.pk.on{color:#0ca30c;border-color:#0ca30c66;background:#0ca30c14;font-weight:600}
 .ev{display:block;color:var(--muted);font-size:11px;
 font-variant-numeric:tabular-nums;word-break:break-all}
 .tsec{border-top:1px solid var(--grid);padding-top:8px;font-size:12px}
@@ -273,6 +278,19 @@ def _cell(finding):
             f'<i aria-hidden="true">{meta["glyph"]}</i><span>{meta["label"]}</span></span></td>')
 
 
+def _package_grid(index, present):
+    """Which packages of a multi-package SDK carry a part, grouped by layer."""
+    rows = []
+    for layer, members in index.units_by_layer():
+        chips = "".join(
+            f'<span class="pk{" on" if u in present else ""}">{_esc(u)}</span>'
+            for u in members
+        )
+        rows.append(f'<span class="pkl">{_esc(layer)}</span>'
+                    f'<span class="pkg">{chips}</span>')
+    return f'<span class="pkrow">{"".join(rows)}</span>'
+
+
 def _parts_list(finding, index=None):
     if not finding.parts:
         return '<p class="why">Nothing to check against; see the reason above.</p>'
@@ -283,23 +301,21 @@ def _parts_list(finding, index=None):
     for part in finding.parts:
         mark = "\u2713" if part.found else "\u2715"
         color = STATUS[SUPPORTED]["color"] if part.found else STATUS[MISSING]["color"]
-        if part.found:
-            # Name the packages, not just the paths: for an SDK published as eleven
-            # packages, which ones have it is the whole question.
-            where = sorted({u for e in part.evidence
-                            if (u := index.unit_of(e.rsplit(":", 1)[0]))}) if units else []
-            in_packages = (f'<span class="ev units">in {_esc(", ".join(where))}</span>'
-                           if where else "")
-            ev = in_packages + "".join(f'<span class="ev">{_esc(e)}</span>'
-                                       for e in part.evidence[:2])
+        where = ({u for e in part.evidence
+                  if (u := index.unit_of(e.rsplit(":", 1)[0]))} if units else set())
+        if units:
+            # Every package listed, present or not. A package is only expected to carry
+            # what its layer implies, so absence is drawn as absence and not as a fault.
+            ev = _package_grid(index, where)
+        elif part.found:
+            ev = "".join(f'<span class="ev">{_esc(e)}</span>' for e in part.evidence[:2])
         else:
-            ev = ('<span class="ev">not found in any of the '
-                  f'{len(units)} packages</span>' if units
-                  else '<span class="ev">not found</span>')
+            ev = '<span class="ev">not found</span>' 
         items.append(
             f'<li><span class="m" style="color:{color}" aria-hidden="true">{mark}</span>'
-            f'<span><span class="n">{_esc(part.name)}</span>{ev}</span>'
-            f'<span class="k">{_esc(part.kind)}</span></li>'
+            f'<span class="pbody">'
+            f'<span class="prow"><span class="n">{_esc(part.name)}</span>'
+            f'<span class="k">{_esc(part.kind)}</span></span>{ev}</span></li>'
         )
     return (f'<p class="why" style="margin-bottom:5px"><b style="font-size:11px;'
             f'text-transform:uppercase;letter-spacing:.06em">{head}</b></p>'
@@ -327,21 +343,6 @@ def _detail(cap, row, sdks, detail_id, cols, indexes=None):
     if cap.inputs:
         meta.append("Declared inputs: " + ", ".join(
             f'<code>{_esc(i)}</code> ({_esc(t)})' for i, t in cap.inputs))
-    prod = getattr(row, "product_tests", [])
-    if prod:
-        seen, items = set(), []
-        for term, where in prod:
-            if where in seen:
-                continue
-            seen.add(where)
-            items.append(f'<li>{_esc(where)} <span style="opacity:.75">via {_esc(term)}</span></li>')
-        covered = any(f.tests for f in row.findings.values())
-        note = ("" if covered else
-                ' <span style="color:var(--crit)">Exercised by the server\'s suites and by '
-                'no SDK suite.</span>')
-        meta.append(f'<span class="psuite"><b>Product suites &middot; {len(seen)} reference'
-                    f'{"s" if len(seen) != 1 else ""}</b>{note}<ul>{"".join(items[:6])}</ul></span>')
-
     cards = []
     for sdk in sdks:
         f = row.findings[sdk["id"]]

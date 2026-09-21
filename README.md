@@ -44,9 +44,9 @@ detail says what the verdict is made of:
 - **End-to-end coverage, per SDK.** Which tests in that SDK's own suite reference the
   capability, and the term they were matched on. Mobile suites are Maestro flows keyed on
   `thunderid-field-<identifier>`; the JavaScript suite is Playwright.
-- **The product's own suites.** The server's integration and end-to-end tests, scored once.
-  A capability the server exercises and no SDK suite does is called out: the behaviour is
-  known to work and known to be reachable, and no client drives it.
+The server's own integration and end-to-end suites are still measured and carried in
+`out/parity.json`, but they are not shown on the page: what a server test covers says
+nothing about whether an SDK can drive it, which is the question the page exists to answer.
 
 The `E2E` column on each row is the short version: how many SDK suites reference the
 capability at all. Implementation and test coverage are kept as separate claims, because an
@@ -55,11 +55,19 @@ SDK can render an input that nothing ever exercises.
 ## A column is a repository, not a package
 
 Each SDK column covers every package in its repository: JavaScript is eleven, Apple and
-Android two each. A cell reads *Missing* only when nothing in any of them has it, and the
-detail view says which, so `not found in any of the 11 packages` cannot be mistaken for
-"not found in the one I had in mind". Where something is present, the packages are named -
-`in nuxt, react, vue` - which is how divergence inside one repository shows up, since a
-capability in react and not in vue is as real a gap as one in JavaScript and not in Swift.
+Android two each. A cell reads *Missing* only when nothing in any of them has it.
+
+The detail view breaks every part down package by package, grouped by the layer each package
+sits at, so divergence inside one repository is visible: a capability in react and not in vue
+is as real a gap as one in JavaScript and not in Swift. Packages are listed whether or not
+they carry the part, because absence has to be read against the layer. No Platform package
+renders an input and nothing below Core Lib ships UI, so `browser` lacking `CONSENT_INPUT` is
+the architecture working, while `vue` lacking it is a gap. Present packages are marked;
+absent ones are drawn plainly rather than as faults, and the report does not pretend to know
+which is which.
+
+The layer for each package comes from the specification's architecture section and is
+declared in `parity.config.yaml` under `layers`.
 
 ## Verdicts
 

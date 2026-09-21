@@ -49,17 +49,18 @@ Quote the part, never the verdict. "Partial" is not a finding; "renders no `CONS
 though it does submit `consent_decisions`" is.
 
 Coverage of an implementation and coverage by a test are separate claims. Do not report an
-untested capability as a gap in implementation, and do not report a tested one as safe if
-the implementation parts are crossed. The sharpest finding is a capability the product's own
-suites exercise and no SDK suite touches: the behaviour works, it is reachable, and no client
-drives it.
+untested capability as a gap in implementation, and do not report a tested one as safe if the
+implementation parts are crossed.
 
 ## Columns are repositories
 
 A column covers every package in its repository. *Missing* means absent from all of them,
-and the detail names the packages a part was found in. Say "not in any of the eleven
-JavaScript packages" rather than "not in the JavaScript SDK", and when a part is present in
-some packages only, that is itself worth reporting.
+and the detail lists every package, grouped by layer, marking the ones that carry the part.
+
+Read absence against the layer before calling it a gap. A Platform package does not render
+inputs and nothing below Core Lib ships UI, so `node` without `OTP_INPUT` is correct and
+`vue` without it is not. Name the packages: "in react and nuxt, not vue" beats "in the
+JavaScript SDK".
 
 If every E2E cell reads zero, suspect the configuration before the tests: a declared suite
 that indexes no files is reported as a warning at the top of the page and on stderr, and the

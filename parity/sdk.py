@@ -27,6 +27,7 @@ class SdkIndex:
         self.e2e_dirs = spec.get("e2e", [])
         unit_rx = spec.get("units")
         self.unit_rx = re.compile(unit_rx) if unit_rx else None
+        self.layers = spec.get("layers") or {}
         self.spellings = {}
         self.files = self._collect()
         self.texts = {p: p.read_text(encoding="utf-8", errors="replace") for p in self.files}
@@ -98,6 +99,26 @@ class SdkIndex:
         m = self.unit_rx.search(rel_path)
         return m.group(1) if m else None
 
+    def layer_of(self, unit: str) -> str:
+        for layer, members in self.layers.items():
+            if unit in members:
+                return layer
+        return "Other"
+
+    def units_by_layer(self) -> list:
+        """[(layer, [package, ...])] in the layering order the configuration declares."""
+        known = self.units()
+        out = []
+        for layer, members in self.layers.items():
+            present = [u for u in members if u in known]
+            if present:
+                out.append((layer, present))
+        placed = {u for _, us in out for u in us}
+        rest = [u for u in known if u not in placed]
+        if rest:
+            out.append(("Other", rest))
+        return out
+
     def units(self) -> list:
         """Every package in this SDK, whether or not anything was found in it."""
         if not self.unit_rx:
@@ -107,7 +128,7 @@ class SdkIndex:
 
     # ----------------------------------------------------------------------- detectors
 
-    def _spread(self, matches, limit):
+    def _spread(self, matches, limit=None):
         """Keep one hit per package, so evidence covers the SDK rather than one corner."""
         by_unit, extra = {}, []
         for rel_path, line in matches:
@@ -117,9 +138,9 @@ class SdkIndex:
             elif unit not in by_unit:
                 by_unit[unit] = f"{rel_path}:{line}"
         ordered = [by_unit[u] for u in sorted(by_unit)] + extra
-        return ordered[:limit]
+        return ordered if limit is None else ordered[:limit]
 
-    def find_literal(self, wire: str, limit: int = 8) -> list:
+    def find_literal(self, wire: str, limit=None) -> list:
         """Files quoting a wire constant verbatim, e.g. 'OTP_INPUT'."""
         pattern = re.compile(r"""['"]""" + re.escape(wire) + r"""['"]""")
         matches = []
@@ -162,7 +183,7 @@ class SdkIndex:
     def config_files(self) -> list:
         return [p for p in self.files if "config" in p.name.lower()]
 
-    def find_identifier(self, ident: str, paths=None, limit: int = 8) -> list:
+    def find_identifier(self, ident: str, paths=None, limit=None) -> list:
         """Whole-word identifier hits, used for configuration keys."""
         rx = re.compile(r"\b" + re.escape(ident) + r"\b")
         matches = []
@@ -224,6 +245,26 @@ class TestCorpus:
             return None
         m = self.unit_rx.search(rel_path)
         return m.group(1) if m else None
+
+    def layer_of(self, unit: str) -> str:
+        for layer, members in self.layers.items():
+            if unit in members:
+                return layer
+        return "Other"
+
+    def units_by_layer(self) -> list:
+        """[(layer, [package, ...])] in the layering order the configuration declares."""
+        known = self.units()
+        out = []
+        for layer, members in self.layers.items():
+            present = [u for u in members if u in known]
+            if present:
+                out.append((layer, present))
+        placed = {u for _, us in out for u in us}
+        rest = [u for u in known if u not in placed]
+        if rest:
+            out.append(("Other", rest))
+        return out
 
     def units(self) -> list:
         """Every package in this SDK, whether or not anything was found in it."""
