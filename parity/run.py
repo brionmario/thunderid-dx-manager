@@ -10,7 +10,7 @@ import yaml
 
 from .analyze import Analyzer
 from .product import discover, extra_operation_capabilities
-from .sdk import SdkIndex
+from .sdk import SdkIndex, TestCorpus
 
 
 def _git(repo: Path, *args) -> str:
@@ -65,7 +65,8 @@ def load(config_path: Path):
     caps = discover(product, cfg["sources"])
     caps += extra_operation_capabilities(
         indexes, [c for c in caps if c.axis == "surface"], overrides)
-    analyzer = Analyzer(caps, indexes, overrides)
+    product_tests = TestCorpus(product, cfg["sources"].get("product_tests"))
+    analyzer = Analyzer(caps, indexes, overrides, product_tests)
     rows = analyzer.run()
 
     return {
@@ -74,4 +75,5 @@ def load(config_path: Path):
         "product": provenance(product),
         "generated": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC"),
         "stale_overrides": analyzer.stale_overrides(),
+        "product_test_files": len(product_tests.files),
     }

@@ -57,7 +57,18 @@ def to_json(result):
                 "notes": r.capability.notes,
                 "inputs": [{"identifier": i, "type": t} for i, t in r.capability.inputs],
                 "sdks": {
-                    sid: {"status": f.status, "evidence": f.evidence, "reason": f.reason}
+                    sid: {
+                        "status": f.status,
+                        "evidence": f.evidence,
+                        "reason": f.reason,
+                        "matchMode": f.match_mode,
+                        "parts": [
+                            {"name": p.name, "kind": p.kind,
+                             "found": p.found, "evidence": p.evidence}
+                            for p in f.parts
+                        ],
+                        "tests": [{"term": t, "at": w} for t, w in f.tests],
+                    }
                     for sid, f in r.findings.items()
                 },
             }

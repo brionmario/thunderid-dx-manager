@@ -35,6 +35,21 @@ not comment an SDK out, because a dropped column reads as "no gaps here".
 4. **Stale overrides.** An override names a capability that no longer exists upstream.
    Find what replaced it before deleting the entry.
 
+## Reading the detail
+
+Each row in the HTML expands. In `out/parity.json` the same thing is `sdks.<id>.parts` (each
+artifact the capability needs, with `found` and `evidence`), `sdks.<id>.tests` (that SDK's
+own suite) and the row's product-suite references.
+
+Quote the part, never the verdict. "Partial" is not a finding; "renders no `CONSENT_INPUT`,
+though it does submit `consent_decisions`" is.
+
+Coverage of an implementation and coverage by a test are separate claims. Do not report an
+untested capability as a gap in implementation, and do not report a tested one as safe if
+the implementation parts are crossed. The sharpest finding is a capability the product's own
+suites exercise and no SDK suite touches: the behaviour works, it is reachable, and no client
+drives it.
+
 ## Reading a verdict
 
 Every `Supported` cites `file:line` in the SDK. Before reporting a gap to someone, open the

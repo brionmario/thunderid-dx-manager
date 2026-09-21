@@ -32,6 +32,26 @@ embedding so `GithubOAuthExecutor` inherits the verdict from the OAuth executor 
 The other executors are carried in the report marked *not applicable*, so you can see that
 they were considered.
 
+## The detail view
+
+Select any row in the report to expand it. A verdict on its own cannot be acted on, so the
+detail says what the verdict is made of:
+
+- **What the capability needs.** Each artifact the SDK must have - an input type to render,
+  an identifier to submit, an operation to expose - ticked or crossed individually, with the
+  `file:line` behind every tick. This is what turns *Partial* into "handles the
+  `consent_decisions` submission but renders no `CONSENT_INPUT`".
+- **End-to-end coverage, per SDK.** Which tests in that SDK's own suite reference the
+  capability, and the term they were matched on. Mobile suites are Maestro flows keyed on
+  `thunderid-field-<identifier>`; the JavaScript suite is Playwright.
+- **The product's own suites.** The server's integration and end-to-end tests, scored once.
+  A capability the server exercises and no SDK suite does is called out: the behaviour is
+  known to work and known to be reachable, and no client drives it.
+
+The `E2E` column on each row is the short version: how many SDK suites reference the
+capability at all. Implementation and test coverage are kept as separate claims, because an
+SDK can render an input that nothing ever exercises.
+
 ## Verdicts
 
 | Verdict | Meaning |

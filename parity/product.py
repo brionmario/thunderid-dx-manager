@@ -121,6 +121,12 @@ INPUT_ITEM_RE = re.compile(r"Identifier:\s*([^,\n]+),\s*\n\s*Type:\s*([^,\n]+),"
 
 CLIENT_FACING_STATUS = ("ExecUserInputRequired", "ExecExternalRedirection")
 
+# The Go identifier, as it reaches the client on the wire.
+WIRE_STATUS = {
+    "ExecUserInputRequired": "USER_INPUT_REQUIRED",
+    "ExecExternalRedirection": "EXTERNAL_REDIRECTION",
+}
+
 
 def _go_files(d: Path) -> list:
     return [p for p in sorted(d.glob("*.go")) if not p.name.endswith("_test.go")]
@@ -240,7 +246,7 @@ def executor_capabilities(root: Path, exec_dir_rel: str, consts_rel: str, wire_t
                 client_facing=facing,
                 inputs=sorted(set(inputs)),
                 notes=(
-                    f"Emits {status} to the client."
+                    f"Emits {WIRE_STATUS.get(status, status)} to the client."
                     if facing
                     else "Never prompts the client; no SDK support required."
                 ),

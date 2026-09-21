@@ -60,3 +60,6 @@ sources:
   executor_consts: backend/internal/flow/executor/constants.go
   wire_consts:     backend/pkg/thunderidengine/providers/constants.go
   element_types:   frontend/apps/console/src/features/flows/models/elements.ts
+  product_tests:
+    - tests/integration
+    - tests/e2e

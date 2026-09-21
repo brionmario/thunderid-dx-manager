@@ -51,12 +51,34 @@ class Capability:
 
 
 @dataclass
+class Part:
+    """One artifact a capability needs, and whether the SDK has it.
+
+    A verdict on its own cannot be acted on: "partial" does not say which half is
+    missing. Parts are what the detail view shows, so a gap arrives with the specific
+    thing to go and implement.
+    """
+
+    name: str                                      # "OTP_INPUT", "consent_decisions", ...
+    kind: str                                      # what sort of artifact it is
+    found: bool = False
+    evidence: list = field(default_factory=list)   # ["path:line", ...]
+
+
+@dataclass
 class Finding:
     """What one SDK does about one capability."""
 
     status: str
     evidence: list = field(default_factory=list)   # ["path:line", ...]
     reason: str = ""                               # required for na / unknown
+    parts: list = field(default_factory=list)      # [Part, ...]
+    match_mode: str = "all"                        # "all" parts needed, or "any" of them
+    tests: list = field(default_factory=list)      # [(term, "path:line"), ...]
+
+    @property
+    def tested(self) -> bool:
+        return bool(self.tests)
 
 
 @dataclass

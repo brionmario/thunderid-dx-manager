@@ -87,6 +87,42 @@ letter-spacing:.06em;color:var(--ink2)}
 padding:10px 16px;border-top:1px solid var(--grid)}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* expandable detail */
+tr.row{cursor:pointer}
+tr.row:focus-visible{outline:2px solid var(--ink);outline-offset:-2px}
+td.cap .tw{display:inline-flex;align-items:center;gap:7px}
+.caret{color:var(--muted);font-size:10px;transition:transform .12s ease;display:inline-block}
+tr.row[aria-expanded="true"] .caret{transform:rotate(90deg)}
+td.tested{text-align:center;width:66px;color:var(--ink2);font-variant-numeric:tabular-nums;
+white-space:nowrap}
+tr.detail>td{background:var(--plane);padding:0}
+.dwrap{padding:14px 16px;border-left:3px solid var(--rule)}
+.dmeta{color:var(--ink2);margin:0 0 12px;max-width:80ch}
+.dmeta code{font-size:11px;color:var(--muted)}
+.psuite{display:block;margin-top:9px;padding-top:9px;border-top:1px solid var(--grid);font-size:12px}
+.psuite b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+.psuite ul{list-style:none;margin:5px 0 0;padding:0}
+.psuite li{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;word-break:break-all}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.dcard{background:var(--surface);border:1px solid var(--ring);border-radius:9px;padding:12px}
+.dcard h4{margin:0 0 8px;font-size:13px;display:flex;align-items:center;
+justify-content:space-between;gap:8px}
+.dcard .why{color:var(--ink2);font-size:12px;margin:0 0 9px}
+ul.parts{list-style:none;margin:0 0 9px;padding:0;font-size:12px}
+ul.parts li{display:flex;gap:7px;align-items:baseline;padding:2px 0;
+border-bottom:1px solid var(--grid)}
+ul.parts li:last-child{border-bottom:0}
+ul.parts .m{font-weight:700;width:11px;flex:none}
+ul.parts .n{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
+ul.parts .k{color:var(--muted);font-size:11px;margin-left:auto;white-space:nowrap}
+ul.parts .ev{display:block;color:var(--muted);font-size:11px;
+font-variant-numeric:tabular-nums;word-break:break-all}
+.tsec{border-top:1px solid var(--grid);padding-top:8px;font-size:12px}
+.tsec b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
+.tsec ul{list-style:none;margin:5px 0 0;padding:0}
+.tsec li{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;
+word-break:break-all;padding:1px 0}
+.tsec .none{color:var(--crit)}
 ul.alert{margin:0;padding-left:20px}
 ul.alert li{margin:3px 0}
 ul.alert code{font-size:12px}
@@ -111,11 +147,16 @@ function apply(){
       const okGap  = !only || tr.dataset.gap==='1';
       const vis = okAxis && okTerm && okGap;
       tr.hidden=!vis; if(vis) shown++;
+      const d=document.getElementById(tr.dataset.detail);
+      if(d && !vis){ d.hidden=true; tr.setAttribute('aria-expanded','false'); }
     });
     // A group heading is only meaningful while a row under it survives the filter.
     sec.querySelectorAll('tbody tr.grp').forEach(h=>{
       let n=h.nextElementSibling, any=false;
-      while(n && !n.classList.contains('grp')){ if(!n.hidden) any=true; n=n.nextElementSibling; }
+      while(n && !n.classList.contains('grp')){
+        if(!n.hidden && n.classList.contains('row')) any=true;
+        n=n.nextElementSibling;
+      }
       h.hidden=!any;
     });
     sec.hidden = shown===0;
@@ -123,6 +164,22 @@ function apply(){
   });
 }
 [q,ax,gapsOnly].forEach(el=>el.addEventListener('input',apply));
+
+// Rows expand in place rather than opening a panel, so several can be compared at once
+// and a filtered view keeps its shape.
+function toggle(tr){
+  const d=document.getElementById(tr.dataset.detail);
+  if(!d) return;
+  const open=tr.getAttribute('aria-expanded')==='true';
+  tr.setAttribute('aria-expanded', open?'false':'true');
+  d.hidden=open;
+}
+document.querySelectorAll('tr.row').forEach(tr=>{
+  tr.addEventListener('click',e=>{ if(!e.target.closest('a')) toggle(tr); });
+  tr.addEventListener('keydown',e=>{
+    if(e.key==='Enter'||e.key===' '){ e.preventDefault(); toggle(tr); }
+  });
+});
 apply();
 """
 
@@ -167,31 +224,122 @@ def _cell(finding):
             f'<i aria-hidden="true">{meta["glyph"]}</i><span>{meta["label"]}</span></span></td>')
 
 
+def _parts_list(finding):
+    if not finding.parts:
+        return '<p class="why">Nothing to check against; see the reason above.</p>'
+    head = ("Needs all of:" if finding.match_mode == "all" and len(finding.parts) > 1
+            else "Needs any one of:" if finding.match_mode == "any" else "Needs:")
+    items = []
+    for part in finding.parts:
+        mark = "\u2713" if part.found else "\u2715"
+        color = STATUS[SUPPORTED]["color"] if part.found else STATUS[MISSING]["color"]
+        ev = ("".join(f'<span class="ev">{_esc(e)}</span>' for e in part.evidence[:2])
+              if part.found else '<span class="ev">not found</span>')
+        items.append(
+            f'<li><span class="m" style="color:{color}" aria-hidden="true">{mark}</span>'
+            f'<span><span class="n">{_esc(part.name)}</span>{ev}</span>'
+            f'<span class="k">{_esc(part.kind)}</span></li>'
+        )
+    return (f'<p class="why" style="margin-bottom:5px"><b style="font-size:11px;'
+            f'text-transform:uppercase;letter-spacing:.06em">{head}</b></p>'
+            f'<ul class="parts">{"".join(items)}</ul>')
+
+
+def _tests_block(finding):
+    if not finding.tests:
+        return ('<div class="tsec"><b>End-to-end</b>'
+                '<ul><li class="none">No test in this SDK\'s suite references it.</li></ul></div>')
+    seen, items = set(), []
+    for term, where in finding.tests:
+        if where in seen:
+            continue
+        seen.add(where)
+        items.append(f'<li>{_esc(where)} <span style="opacity:.75">via {_esc(term)}</span></li>')
+    return (f'<div class="tsec"><b>End-to-end &middot; {len(seen)} reference'
+            f'{"s" if len(seen) != 1 else ""}</b><ul>{"".join(items[:6])}</ul></div>')
+
+
+def _detail(cap, row, sdks, detail_id, cols):
+    meta = [f'Discovered at <code>{_esc(cap.origin)}</code>.']
+    if cap.notes:
+        meta.append(_esc(cap.notes))
+    if cap.inputs:
+        meta.append("Declared inputs: " + ", ".join(
+            f'<code>{_esc(i)}</code> ({_esc(t)})' for i, t in cap.inputs))
+    prod = getattr(row, "product_tests", [])
+    if prod:
+        seen, items = set(), []
+        for term, where in prod:
+            if where in seen:
+                continue
+            seen.add(where)
+            items.append(f'<li>{_esc(where)} <span style="opacity:.75">via {_esc(term)}</span></li>')
+        covered = any(f.tests for f in row.findings.values())
+        note = ("" if covered else
+                ' <span style="color:var(--crit)">Exercised by the server\'s suites and by '
+                'no SDK suite.</span>')
+        meta.append(f'<span class="psuite"><b>Product suites &middot; {len(seen)} reference'
+                    f'{"s" if len(seen) != 1 else ""}</b>{note}<ul>{"".join(items[:6])}</ul></span>')
+
+    cards = []
+    for sdk in sdks:
+        f = row.findings[sdk["id"]]
+        m = STATUS[f.status]
+        cards.append(
+            f'<div class="dcard"><h4>{_esc(sdk["label"])}'
+            f'<span class="pill" style="color:{m["color"]};background:{m["color"]}18;'
+            f'border-color:{m["color"]}40"><i aria-hidden="true">{m["glyph"]}</i>'
+            f'<span>{m["label"]}</span></span></h4>'
+            + (f'<p class="why">{_esc(f.reason)}</p>' if f.reason else "")
+            + _parts_list(f) + _tests_block(f) + '</div>'
+        )
+    return (f'<tr class="detail" id="{detail_id}" hidden><td colspan="{cols}">'
+            f'<div class="dwrap"><p class="dmeta">{" ".join(meta)}</p>'
+            f'<div class="dgrid">{"".join(cards)}</div></div></td></tr>')
+
+
 def _matrix(axis, title, rows, sdks):
     if not rows:
         return ""
-    head = "".join(f"<th>{_esc(s['label'])}</th>" for s in sdks)
+    head = "".join(f"<th>{_esc(s['label'])}</th>" for s in sdks) + "<th>E2E</th>"
     body, last_group = [], None
     for r in sorted(rows, key=lambda r: (r.capability.group, not r.is_gap, r.capability.name)):
         cap = r.capability
         if cap.group != last_group:
             last_group = cap.group
-            body.append(f'<tr class="grp"><td colspan="{len(sdks)+1}">{_esc(cap.group)}</td></tr>')
+            body.append(f'<tr class="grp"><td colspan="{len(sdks)+2}">{_esc(cap.group)}</td></tr>')
         detail = cap.notes
         if cap.inputs:
             detail += "  Inputs: " + ", ".join(f"{i} ({t})" for i, t in cap.inputs)
         cells = "".join(_cell(r.findings[s["id"]]) for s in sdks)
+        detail_id = f"d-{axis}-{abs(hash(cap.uid)) % 10**9}"
+        tested = sum(1 for s in sdks if r.findings[s["id"]].tests)
+        scored_n = sum(1 for s in sdks if r.findings[s["id"]].status != NOT_APPLICABLE)
+        tint = (STATUS[SUPPORTED]["color"] if tested and tested >= scored_n
+                else STATUS[PARTIAL]["color"] if tested
+                else STATUS[MISSING]["color"] if scored_n else "var(--muted)")
+        e2e = (f'<td class="tested" style="color:{tint}" '
+               f'title="End-to-end suites referencing this capability">'
+               f'{tested}/{len(sdks)}</td>')
         body.append(
-            f'<tr data-name="{_esc(cap.name.lower())}" data-gap="{1 if r.is_gap else 0}">'
-            f'<td class="cap" title="{_esc(detail)}"><b>{_esc(cap.name)}</b>'
-            f'<span class="origin">{_esc(cap.origin)}</span></td>{cells}</tr>'
+            f'<tr class="row" tabindex="0" role="button" aria-expanded="false" '
+            f'aria-controls="{detail_id}" data-detail="{detail_id}" '
+            f'data-name="{_esc(cap.name.lower())}" data-gap="{1 if r.is_gap else 0}">'
+            f'<td class="cap" title="{_esc(detail)}">'
+            f'<span class="tw"><span class="caret" aria-hidden="true">&#9654;</span>'
+            f'<b>{_esc(cap.name)}</b></span>'
+            f'<span class="origin">{_esc(cap.origin)}</span></td>{cells}{e2e}</tr>'
         )
+        body.append(_detail(cap, r, sdks, detail_id, len(sdks) + 2))
     legend = "".join(
         f'<span><i class="dot" style="background:{m["color"]}"></i>'
         f'<i aria-hidden="true" style="color:{m["color"]};font-weight:700">{m["glyph"]}</i>'
         f'{m["label"]}</span>'
         for m in STATUS.values()
     )
+    legend += ('<span style="margin-left:auto;color:var(--muted)">'
+               'E2E: SDK suites referencing the capability &middot; '
+               'select a row for the evidence behind every cell</span>')
     return f"""<section class="card" data-axis="{axis}">
   <header><h2>{_esc(title)}</h2><span class="count">{len(rows)} capabilities</span></header>
   <div class="scroll"><table>

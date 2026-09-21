@@ -24,9 +24,13 @@ class SdkIndex:
         client = spec.get("client")
         self.client_rels = [client] if isinstance(client, str) else list(client or [])
         self.method_pattern = spec.get("method_pattern")
+        self.e2e_dirs = spec.get("e2e", [])
         self.spellings = {}
         self.files = self._collect()
         self.texts = {p: p.read_text(encoding="utf-8", errors="replace") for p in self.files}
+        self.e2e_files = self._collect_e2e()
+        self.e2e_texts = {p: p.read_text(encoding="utf-8", errors="replace")
+                          for p in self.e2e_files}
         self._methods = None
 
     # ------------------------------------------------------------------ file collection
@@ -42,6 +46,40 @@ class SdkIndex:
                 if p.is_file() and not self._excluded(p):
                     out.append(p)
         return sorted(set(out))
+
+    # End-to-end suites are their own corpus. A Maestro flow is YAML and a Playwright spec
+    # is TypeScript, so the SDK's own source globs would miss half of them; and a match in a
+    # test proves the behaviour is exercised, which is a different claim from a match in the
+    # implementation.
+    E2E_SUFFIXES = (".ts", ".tsx", ".js", ".yaml", ".yml", ".swift", ".kt", ".dart")
+    E2E_SKIP = (".thunderid-server", "/node_modules/", "/report", "/.git/")
+
+    def _collect_e2e(self) -> list:
+        out = []
+        for d in self.e2e_dirs:
+            base = self.root / d
+            if not base.exists():
+                continue
+            for p in base.rglob("*"):
+                if not p.is_file() or p.suffix not in self.E2E_SUFFIXES:
+                    continue
+                if any(frag in str(p) for frag in self.E2E_SKIP):
+                    continue
+                out.append(p)
+        return sorted(set(out))
+
+    def find_in_tests(self, term: str, word: bool = True, limit: int = 5) -> list:
+        """Where an end-to-end test references a term."""
+        rx = (re.compile(r"\b" + re.escape(term) + r"\b") if word
+              else re.compile(re.escape(term), re.I))
+        hits = []
+        for p, text in self.e2e_texts.items():
+            m = rx.search(text)
+            if m:
+                hits.append(f"{self.rel(p)}:{text.count(chr(10), 0, m.start()) + 1}")
+            if len(hits) >= limit:
+                break
+        return hits
 
     def rel(self, path: Path) -> str:
         try:
@@ -119,6 +157,50 @@ NOT_AN_OPERATION = {
     "super", "this", "catch", "try", "do", "else", "when", "toString", "hashCode",
     "equals", "copyWith", "dispose", "build", "noSuchMethod", "runtimeType",
 }
+
+
+class TestCorpus:
+    """A suite of tests, indexed for reference lookups.
+
+    Used for the product's own integration and end-to-end suites. A capability the server
+    tests but no SDK does is the sharpest version of a parity gap: the behaviour is known
+    to work and known to be reachable, and no client exercises it.
+    """
+
+    SUFFIXES = (".go", ".ts", ".tsx", ".js", ".yaml", ".yml")
+    SKIP = ("/node_modules/", "/.git/", "/dist/", "/build/")
+
+    def __init__(self, root: Path, dirs, label: str = "product"):
+        self.root, self.label = Path(root), label
+        self.files = []
+        for d in dirs or []:
+            base = self.root / d
+            if not base.exists():
+                continue
+            for p in base.rglob("*"):
+                if (p.is_file() and p.suffix in self.SUFFIXES
+                        and not any(f in str(p) for f in self.SKIP)):
+                    self.files.append(p)
+        self.files = sorted(set(self.files))
+        self.texts = {p: p.read_text(encoding="utf-8", errors="replace") for p in self.files}
+
+    def rel(self, path: Path) -> str:
+        try:
+            return str(path.relative_to(self.root))
+        except ValueError:
+            return str(path)
+
+    def find(self, term: str, word: bool = True, limit: int = 4) -> list:
+        rx = (re.compile(r"\b" + re.escape(term) + r"\b") if word
+              else re.compile(re.escape(term), re.I))
+        hits = []
+        for p, text in self.texts.items():
+            m = rx.search(text)
+            if m:
+                hits.append(f"{self.rel(p)}:{text.count(chr(10), 0, m.start()) + 1}")
+            if len(hits) >= limit:
+                break
+        return hits
 
 
 def norm(name: str) -> str:
