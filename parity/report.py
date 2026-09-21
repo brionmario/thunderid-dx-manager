@@ -115,7 +115,8 @@ ul.parts li:last-child{border-bottom:0}
 ul.parts .m{font-weight:700;width:11px;flex:none}
 ul.parts .n{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px}
 ul.parts .k{color:var(--muted);font-size:11px;margin-left:auto;white-space:nowrap}
-ul.parts .ev{display:block;color:var(--muted);font-size:11px;
+ul.parts .ev.units{color:var(--ink2);font-family:inherit;font-size:11px}
+.ev{display:block;color:var(--muted);font-size:11px;
 font-variant-numeric:tabular-nums;word-break:break-all}
 .tsec{border-top:1px solid var(--grid);padding-top:8px;font-size:12px}
 .tsec b{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2)}
@@ -123,6 +124,11 @@ font-variant-numeric:tabular-nums;word-break:break-all}
 .tsec li{color:var(--muted);font-size:11px;font-variant-numeric:tabular-nums;
 word-break:break-all;padding:1px 0}
 .tsec .none{color:var(--crit)}
+.warn{background:var(--surface);border:1px solid #d03b3b60;border-left:3px solid #d03b3b;
+border-radius:9px;padding:11px 14px;margin:0 0 14px;font-size:13px}
+.warn b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+color:var(--crit);margin-bottom:4px}
+.warn ul{margin:0;padding-left:18px;color:var(--ink2)}
 .summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
 .chip{display:inline-flex;align-items:baseline;gap:5px;font-size:12px;color:var(--ink2);
 background:var(--surface);border:1px solid var(--ring);border-radius:999px;padding:5px 11px}
@@ -247,17 +253,29 @@ def _cell(finding):
             f'<i aria-hidden="true">{meta["glyph"]}</i><span>{meta["label"]}</span></span></td>')
 
 
-def _parts_list(finding):
+def _parts_list(finding, index=None):
     if not finding.parts:
         return '<p class="why">Nothing to check against; see the reason above.</p>'
     head = ("Needs all of:" if finding.match_mode == "all" and len(finding.parts) > 1
             else "Needs any one of:" if finding.match_mode == "any" else "Needs:")
     items = []
+    units = index.units() if index is not None else []
     for part in finding.parts:
         mark = "\u2713" if part.found else "\u2715"
         color = STATUS[SUPPORTED]["color"] if part.found else STATUS[MISSING]["color"]
-        ev = ("".join(f'<span class="ev">{_esc(e)}</span>' for e in part.evidence[:2])
-              if part.found else '<span class="ev">not found</span>')
+        if part.found:
+            # Name the packages, not just the paths: for an SDK published as eleven
+            # packages, which ones have it is the whole question.
+            where = sorted({u for e in part.evidence
+                            if (u := index.unit_of(e.rsplit(":", 1)[0]))}) if units else []
+            in_packages = (f'<span class="ev units">in {_esc(", ".join(where))}</span>'
+                           if where else "")
+            ev = in_packages + "".join(f'<span class="ev">{_esc(e)}</span>'
+                                       for e in part.evidence[:2])
+        else:
+            ev = ('<span class="ev">not found in any of the '
+                  f'{len(units)} packages</span>' if units
+                  else '<span class="ev">not found</span>')
         items.append(
             f'<li><span class="m" style="color:{color}" aria-hidden="true">{mark}</span>'
             f'<span><span class="n">{_esc(part.name)}</span>{ev}</span>'
@@ -282,7 +300,7 @@ def _tests_block(finding):
             f'{"s" if len(seen) != 1 else ""}</b><ul>{"".join(items[:6])}</ul></div>')
 
 
-def _detail(cap, row, sdks, detail_id, cols):
+def _detail(cap, row, sdks, detail_id, cols, indexes=None):
     meta = [f'Discovered at <code>{_esc(cap.origin)}</code>.']
     if cap.notes:
         meta.append(_esc(cap.notes))
@@ -308,23 +326,30 @@ def _detail(cap, row, sdks, detail_id, cols):
     for sdk in sdks:
         f = row.findings[sdk["id"]]
         m = STATUS[f.status]
+        index = indexes.get(sdk["id"]) if indexes else None
         cards.append(
             f'<div class="dcard"><h4>{_esc(sdk["label"])}'
             f'<span class="pill" style="color:{m["color"]};background:{m["color"]}18;'
             f'border-color:{m["color"]}40"><i aria-hidden="true">{m["glyph"]}</i>'
             f'<span>{m["label"]}</span></span></h4>'
             + (f'<p class="why">{_esc(f.reason)}</p>' if f.reason else "")
-            + _parts_list(f) + _tests_block(f) + '</div>'
+            + _parts_list(f, index) + _tests_block(f) + '</div>'
         )
     return (f'<tr class="detail" id="{detail_id}" hidden><td colspan="{cols}">'
             f'<div class="dwrap"><p class="dmeta">{" ".join(meta)}</p>'
             f'<div class="dgrid">{"".join(cards)}</div></div></td></tr>')
 
 
-def _matrix(axis, title, rows, sdks):
+def _matrix(axis, title, rows, sdks, indexes=None):
     if not rows:
         return ""
-    head = "".join(f"<th>{_esc(s['label'])}</th>" for s in sdks) + "<th>E2E</th>"
+    def th(sdk):
+        n = len(indexes[sdk["id"]].units()) if indexes and sdk["id"] in indexes else 0
+        sub = (f'<span style="display:block;font-weight:400;text-transform:none;'
+               f'letter-spacing:0;color:var(--muted)">{n} packages</span>' if n > 1 else "")
+        return f"<th>{_esc(sdk['label'])}{sub}</th>"
+
+    head = "".join(th(s) for s in sdks) + "<th>E2E</th>"
     body, last_group = [], None
     for r in sorted(rows, key=lambda r: (r.capability.group, not r.is_gap, r.capability.name)):
         cap = r.capability
@@ -357,7 +382,7 @@ def _matrix(axis, title, rows, sdks):
             f'<b>{_esc(cap.name)}</b></span>'
             f'<span class="origin">{_esc(cap.origin)}</span></td>{cells}{e2e}</tr>'
         )
-        body.append(_detail(cap, r, sdks, detail_id, len(sdks) + 2))
+        body.append(_detail(cap, r, sdks, detail_id, len(sdks) + 2, indexes))
     legend = "".join(
         f'<span><i class="dot" style="background:{m["color"]}"></i>'
         f'<i aria-hidden="true" style="color:{m["color"]};font-weight:700">{m["glyph"]}</i>'
@@ -376,6 +401,18 @@ def _matrix(axis, title, rows, sdks):
   <p class="empty" hidden>Nothing matches the current filter.</p>
   <div class="legend">{legend}</div>
 </section>"""
+
+
+def _warnings(warnings):
+    """Configuration problems, said out loud on the page.
+
+    A suite that indexes nothing reads exactly like a suite that tests nothing, and the
+    report cannot tell the reader which it is looking at unless it says so here.
+    """
+    if not warnings:
+        return ""
+    items = "".join(f"<li>{_esc(w)}</li>" for w in warnings)
+    return (f'<div class="warn"><b>Check the configuration</b><ul>{items}</ul></div>')
 
 
 def _summary(rows, stale, scored):
@@ -420,7 +457,8 @@ def render(result) -> str:
     tiles = "".join(_tile(s, scored) for s in sdks)
     axis_opts = "".join(f'<option value="{k}">{_esc(v)}</option>' for k, v in AXES.items())
     sections = "".join(
-        _matrix(axis, title, [r for r in rows if r.capability.axis == axis], sdks)
+        _matrix(axis, title, [r for r in rows if r.capability.axis == axis], sdks,
+                result.get("indexes"))
         for axis, title in AXES.items()
     )
     prov = " &middot; ".join(
@@ -441,6 +479,7 @@ specification. Select any row for the evidence behind every cell.</p>
 
 <div class="tiles" style="margin-bottom:18px">{tiles}</div>
 
+{_warnings(result.get("warnings"))}
 {_summary(rows, result["stale_overrides"], scored)}
 
 <div class="controls">

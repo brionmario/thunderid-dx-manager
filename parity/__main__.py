@@ -80,6 +80,8 @@ def to_json(result):
 def main():
     ap = argparse.ArgumentParser(prog="parity", description="Cross-SDK capability parity report.")
     ap.add_argument("-c", "--config", default="parity.config.yaml")
+    ap.add_argument("--sources-root", metavar="DIR",
+                    help="look for every repo under DIR, named after its upstream")
     ap.add_argument("--axis", choices=list(AXES), help="limit the text summary to one axis")
     ap.add_argument("--html", metavar="PATH", help="write the HTML report")
     ap.add_argument("--json", metavar="PATH", help="write the machine-readable report")
@@ -88,7 +90,10 @@ def main():
                     help="exit non-zero when any scored capability is missing everywhere")
     args = ap.parse_args()
 
-    result = load(Path(args.config).resolve())
+    result = load(Path(args.config).resolve(), args.sources_root)
+
+    for w in result["warnings"]:
+        print(f"warning: {w}")
 
     if not args.quiet:
         summarize(result, args.axis)

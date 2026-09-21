@@ -1,5 +1,11 @@
 # Where the sources live. Paths are absolute, or relative to this file.
 #
+# `repo` names the upstream each entry mirrors. With `--sources-root DIR` every path is
+# replaced by DIR/<repo name>, which is how the workflow points the same configuration at
+# its own checkouts. There is deliberately no second configuration file for CI: the two
+# drifted once already, CI silently indexed no end-to-end suites for a day, and every cell
+# in the E2E column read zero without anything saying why.
+#
 # `product` is the ThunderID server monorepo: it owns the backend executors, the wire
 # constants, the console's flow element palette, and the SDK specification that the
 # client surface and configuration axes are read from.
@@ -8,12 +14,18 @@
 # Keep `id` stable: it is the column key in the report and in overrides.yaml.
 
 product: /Users/brion/Desktop/thunderid/sdk-parity
+product_repo: thunder-id/thunderid
 
 sdks:
   - id: javascript
     label: JavaScript
+    repo: thunder-id/javascript-sdks
     path: /Users/brion/Desktop/thunderid/thunderid-sdk-components/sdks/javascript-sdks
     globs: ["*.ts", "*.tsx"]
+    # A JavaScript "SDK" is eleven published packages. Without this the column answers
+    # "somewhere in the repo", which hides the case the layering makes likely: react has
+    # it and vue does not.
+    units: 'packages/([^/]+)/'
     exclude: ["node_modules", "/dist/", "/build/", "__tests__", ".test.", ".spec.", "/docs/"]
     e2e: ["tests/e2e"]
     # The JavaScript surface is spread across the Agnostic, Platform and Framework
@@ -28,8 +40,10 @@ sdks:
 
   - id: ios
     label: iOS
+    repo: thunder-id/ios-sdks
     path: /Users/brion/Desktop/thunderid/thunderid-sdk-components/sdks/ios
     globs: ["*.swift"]
+    units: 'Sources/([^/]+)/'
     exclude: ["/Tests/", "/.build/", "Samples/", "/Pods/"]
     e2e: ["Tests/e2e"]
     client: Sources/ThunderID/ThunderIDClient.swift
@@ -37,8 +51,10 @@ sdks:
 
   - id: android
     label: Android
+    repo: thunder-id/android-sdks
     path: /Users/brion/Desktop/thunderid/thunderid-sdk-components/sdks/android
     globs: ["*.kt"]
+    units: 'kotlin/dev/thunderid/([^/]+)/'
     exclude: ["/test/", "/androidTest/", "/build/", "samples/"]
     e2e: ["tests/e2e"]
     client: src/main/kotlin/dev/thunderid/android/ThunderIDClient.kt
@@ -46,8 +62,10 @@ sdks:
 
   - id: flutter
     label: Flutter
+    repo: thunder-id/flutter-sdks
     path: /Users/brion/Desktop/thunderid/thunderid-sdk-components/sdks/flutter
     globs: ["*.dart"]
+    units: 'lib/()'
     exclude: ["/test/", "/build/", "samples/", "/Pods/", ".g.dart", ".freezed.dart"]
     e2e: ["tests/e2e"]
     client: lib/src/thunderid_client.dart

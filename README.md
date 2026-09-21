@@ -52,6 +52,15 @@ The `E2E` column on each row is the short version: how many SDK suites reference
 capability at all. Implementation and test coverage are kept as separate claims, because an
 SDK can render an input that nothing ever exercises.
 
+## A column is a repository, not a package
+
+Each SDK column covers every package in its repository: JavaScript is eleven, Apple and
+Android two each. A cell reads *Missing* only when nothing in any of them has it, and the
+detail view says which, so `not found in any of the 11 packages` cannot be mistaken for
+"not found in the one I had in mind". Where something is present, the packages are named -
+`in nuxt, react, vue` - which is how divergence inside one repository shows up, since a
+capability in react and not in vue is as real a gap as one in JavaScript and not in Swift.
+
 ## Verdicts
 
 | Verdict | Meaning |
@@ -72,9 +81,12 @@ pip install -r requirements.txt
 python3 -m parity --html out/index.html --json out/parity.json
 ```
 
-Point `parity.config.yaml` at your checkouts first. Useful flags:
+Point `parity.config.yaml` at your checkouts first. It is the only configuration file, and
+the workflow uses the same one with `--sources-root`: a separate CI copy drifted once and
+the published report silently showed no end-to-end coverage anywhere until someone noticed. Useful flags:
 
 ```sh
+python3 -m parity --sources-root src   # every repo under src/, named after its upstream
 python3 -m parity --axis executor      # one axis, as a text table
 python3 -m parity --quiet --json -     # machine-readable only
 python3 -m parity --fail-on-gap        # non-zero exit when something has no SDK at all

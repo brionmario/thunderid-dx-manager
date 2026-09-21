@@ -54,6 +54,17 @@ the implementation parts are crossed. The sharpest finding is a capability the p
 suites exercise and no SDK suite touches: the behaviour works, it is reachable, and no client
 drives it.
 
+## Columns are repositories
+
+A column covers every package in its repository. *Missing* means absent from all of them,
+and the detail names the packages a part was found in. Say "not in any of the eleven
+JavaScript packages" rather than "not in the JavaScript SDK", and when a part is present in
+some packages only, that is itself worth reporting.
+
+If every E2E cell reads zero, suspect the configuration before the tests: a declared suite
+that indexes no files is reported as a warning at the top of the page and on stderr, and the
+workflow fails on it.
+
 ## Reading a verdict
 
 Every `Supported` cites `file:line` in the SDK. Before reporting a gap to someone, open the

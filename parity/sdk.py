@@ -25,6 +25,8 @@ class SdkIndex:
         self.client_rels = [client] if isinstance(client, str) else list(client or [])
         self.method_pattern = spec.get("method_pattern")
         self.e2e_dirs = spec.get("e2e", [])
+        unit_rx = spec.get("units")
+        self.unit_rx = re.compile(unit_rx) if unit_rx else None
         self.spellings = {}
         self.files = self._collect()
         self.texts = {p: p.read_text(encoding="utf-8", errors="replace") for p in self.files}
@@ -87,21 +89,47 @@ class SdkIndex:
         except ValueError:
             return str(path)
 
+    # ------------------------------------------------------------------------- units
+
+    def unit_of(self, rel_path: str):
+        """The published package a file belongs to, where the SDK has more than one."""
+        if not self.unit_rx:
+            return None
+        m = self.unit_rx.search(rel_path)
+        return m.group(1) if m else None
+
+    def units(self) -> list:
+        """Every package in this SDK, whether or not anything was found in it."""
+        if not self.unit_rx:
+            return []
+        found = {u for p in self.files if (u := self.unit_of(self.rel(p)))}
+        return sorted(found)
+
     # ----------------------------------------------------------------------- detectors
 
-    def find_literal(self, wire: str, limit: int = 6) -> list:
+    def _spread(self, matches, limit):
+        """Keep one hit per package, so evidence covers the SDK rather than one corner."""
+        by_unit, extra = {}, []
+        for rel_path, line in matches:
+            unit = self.unit_of(rel_path)
+            if unit is None:
+                extra.append(f"{rel_path}:{line}")
+            elif unit not in by_unit:
+                by_unit[unit] = f"{rel_path}:{line}"
+        ordered = [by_unit[u] for u in sorted(by_unit)] + extra
+        return ordered[:limit]
+
+    def find_literal(self, wire: str, limit: int = 8) -> list:
         """Files quoting a wire constant verbatim, e.g. 'OTP_INPUT'."""
         pattern = re.compile(r"""['"]""" + re.escape(wire) + r"""['"]""")
-        hits = []
+        matches = []
         for p, text in self.texts.items():
             if wire not in text:
                 continue
-            for m in pattern.finditer(text):
-                hits.append(f"{self.rel(p)}:{text.count(chr(10), 0, m.start()) + 1}")
-                break
-            if len(hits) >= limit:
-                break
-        return hits
+            m = pattern.search(text)
+            if m:
+                matches.append((self.rel(p), text.count(chr(10), 0, m.start()) + 1))
+        return self._spread(matches, limit)
 
     @property
     def client_paths(self) -> list:
@@ -134,20 +162,18 @@ class SdkIndex:
     def config_files(self) -> list:
         return [p for p in self.files if "config" in p.name.lower()]
 
-    def find_identifier(self, ident: str, paths=None, limit: int = 4) -> list:
+    def find_identifier(self, ident: str, paths=None, limit: int = 8) -> list:
         """Whole-word identifier hits, used for configuration keys."""
         rx = re.compile(r"\b" + re.escape(ident) + r"\b")
-        hits = []
+        matches = []
         for p in (paths if paths is not None else self.files):
             text = self.texts.get(p)
             if not text or ident not in text:
                 continue
             m = rx.search(text)
             if m:
-                hits.append(f"{self.rel(p)}:{text.count(chr(10), 0, m.start()) + 1}")
-            if len(hits) >= limit:
-                break
-        return hits
+                matches.append((self.rel(p), text.count(chr(10), 0, m.start()) + 1))
+        return self._spread(matches, limit)
 
 
 # Language keywords and platform boilerplate that the method regex picks up but which are
@@ -189,6 +215,22 @@ class TestCorpus:
             return str(path.relative_to(self.root))
         except ValueError:
             return str(path)
+
+    # ------------------------------------------------------------------------- units
+
+    def unit_of(self, rel_path: str):
+        """The published package a file belongs to, where the SDK has more than one."""
+        if not self.unit_rx:
+            return None
+        m = self.unit_rx.search(rel_path)
+        return m.group(1) if m else None
+
+    def units(self) -> list:
+        """Every package in this SDK, whether or not anything was found in it."""
+        if not self.unit_rx:
+            return []
+        found = {u for p in self.files if (u := self.unit_of(self.rel(p)))}
+        return sorted(found)
 
     def find(self, term: str, word: bool = True, limit: int = 4) -> list:
         rx = (re.compile(r"\b" + re.escape(term) + r"\b") if word

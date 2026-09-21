@@ -22,7 +22,7 @@ on:
     paths:
       - "parity/**"
       - "catalogue/**"
-      - "parity.ci.yaml"
+      - "parity.config.yaml"
       - ".github/workflows/report.yml"
 
 permissions:
@@ -83,10 +83,17 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      # One configuration file, repointed at the checkouts above. A second CI-only copy
+      # drifted from the local one once and silently reported no end-to-end coverage
+      # anywhere, so there is no second copy any more.
       - name: Generate the report
         run: |
-          python3 -m parity --config parity.ci.yaml \
-            --html out/index.html --json out/parity.json
+          python3 -m parity --sources-root sources \
+            --html out/index.html --json out/parity.json | tee run.log
+          if grep -q '^warning:' run.log; then
+            echo "::error::the report generated with warnings; see the log above"
+            exit 1
+          fi
 
       - uses: actions/upload-pages-artifact@v3
         with:
