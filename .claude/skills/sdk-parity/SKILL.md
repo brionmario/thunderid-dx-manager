@@ -19,6 +19,10 @@ Add `--axis executor|input|element|surface|config|extra` for one axis as a text 
 `--quiet` to suppress the text summary. Read `out/parity.json` rather than scraping the
 HTML when you need the data.
 
+`--html` writes the dashboard and `how-it-works.html` beside it. The explainer is generated
+from the same code, so an answer about how a verdict is reached belongs there, not in a
+comment on the dashboard.
+
 If a checkout is missing, the run stops and names the path. Fix `parity.config.yaml`; do
 not comment an SDK out, because a dropped column reads as "no gaps here".
 

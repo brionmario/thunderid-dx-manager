@@ -211,7 +211,26 @@ ul.alert li{margin:3px 0}
 ul.alert code{font-size:12px}
 .empty{color:var(--muted);padding:14px 16px}
 footer{color:var(--muted);font-size:12px;margin:22px 0 8px;line-height:1.7}
+footer p{margin:0 0 8px}
 footer code{font-size:11px}
+.flinks{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+.flinks a{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);
+text-decoration:none;border-bottom:1px solid var(--grid);padding-bottom:1px}
+.flinks a:hover{color:var(--ink);border-bottom-color:var(--rule)}
+/* the explainer page */
+.prose{max-width:76ch}
+.prose h2{font-size:19px;margin:6px 0 10px;letter-spacing:-.01em}
+.prose h3{font-size:14px;margin:26px 0 6px}
+.prose p{margin:0 0 10px;color:var(--ink2)}
+.prose code{font-size:12px}
+a.back{color:var(--ink2);text-decoration:none;font-size:13px}
+a.back:hover{color:var(--ink)}
+table.doc{width:100%;border-collapse:collapse;margin:8px 0 14px;font-size:13px}
+table.doc th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
+color:var(--ink2);border-bottom:1px solid var(--rule);padding:6px 10px 6px 0}
+table.doc td{border-bottom:1px solid var(--grid);padding:7px 10px 7px 0;
+color:var(--ink2);vertical-align:top}
+table.doc td:first-child{white-space:nowrap;padding-right:18px}
 a{color:inherit}
 @media (max-width:640px){td.cap{min-width:150px}td.st{width:56px}
 .pill span{display:none}.num{font-size:26px}}
@@ -539,25 +558,38 @@ def _summary(rows, stale, scored):
             f'<span class="chip muted">{len(scored)} scored</span></div>{stale_note}')
 
 
-def render(result) -> str:
-    rows, sdks = result["rows"], result["sdks"]
-    scored = [r for r in rows if getattr(r, "scored", True)]
+# The GitHub mark (octicons mark-github-16), inlined like everything else so the page
+# stays self-contained. It takes currentColor, so it follows the link it sits in.
+OCTOCAT = ('<svg viewBox="0 0 16 16" width="15" height="15" aria-hidden="true" '
+           'fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 '
+           '7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-'
+           '.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 '
+           '1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59'
+           '.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 '
+           '1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 '
+           '2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 '
+           '.21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>')
 
-    tiles = "".join(_tile(s, scored) for s in sdks)
-    axis_opts = "".join(f'<option value="{k}">{_esc(v)}</option>' for k, v in AXES.items())
-    sections = "".join(
-        _matrix(axis, title, [r for r in rows if r.capability.axis == axis], sdks,
-                result.get("indexes"))
-        for axis, title in AXES.items()
-    )
-    prov = " &middot; ".join(
-        f"{_esc(s['label'])} <code>{_esc(s['commit'])}</code>" for s in sdks)
-    total_gaps = sum(1 for r in scored if r.is_gap)
 
+def _footer_links(repo_url, on_about=False):
+    """The two links every page carries: the explainer, and the source."""
+    links = []
+    if not on_about:
+        links.append('<a href="how-it-works.html">How this is measured</a>')
+    if repo_url:
+        name = repo_url.rstrip("/").split("github.com/")[-1]
+        links.append(f'<a href="{_esc(repo_url)}" target="_blank" rel="noopener">'
+                     f'{OCTOCAT}{_esc(name)}</a>')
+    return f'<p class="flinks">{"".join(links)}</p>' if links else ""
+
+
+def _shell(title, body, repo_url, scripts=True):
+    """The page frame: head, theme bootstrap, masthead. Shared by every page so the
+    dashboard and its explainer cannot drift apart visually."""
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ThunderID DX Dashboard</title>
+<title>{title}</title>
 <!-- The mark, all-blue so it reads on a light or a dark browser tab. -->
 <link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20207%20257%22%3E%3Cpath%20d%3D%22M55.4763%2026.4391L58.8866%200H0V26.4391H55.4763Z%22%20fill%3D%22%233688FF%22%2F%3E%3Cpath%20d%3D%22M39.8438%20147.407L49.5455%2072.2839H0V256.743H60.5602L80.048%20147.407H39.8438Z%22%20fill%3D%22%233688FF%22%2F%3E%3Cpath%20d%3D%22M192.42%2059.361C182.782%2040.2307%20168.929%2025.5705%20150.903%2015.3381C145.501%2012.2662%20139.761%209.6605%20133.703%207.5208L115.401%20103.702H159.757L76.2987%20256.743H83.3735C109.449%20256.743%20131.69%20251.574%20150.14%20241.236C168.569%20230.897%20182.634%20216.131%20192.356%20196.959C202.058%20177.765%20206.909%20154.8%20206.909%20128.043C206.909%20101.286%20202.079%2078.5123%20192.441%2059.3821L192.42%2059.361Z%22%20fill%3D%22%233688FF%22%2F%3E%3C%2Fsvg%3E">
 <style>{CSS}</style>
@@ -582,23 +614,42 @@ def render(result) -> str:
   </span>
 </div></header>
 
-<div class="wrap" style="padding-top:0">
-<details class="how">
-  <summary>How this is measured</summary>
-  <p>Nothing here is hand-listed. Every run rediscovers the contract from source: the
-  executors and wire constants from the server, the element palette from the console, and
-  the client surface and configuration keys from the SDK specification. A capability is
-  marked supported only where there is a file and a line in the SDK to justify it. Select
-  any row for the evidence behind every cell.</p>
-</details>
+{body}
+<script>{JS}</script>
+</body></html>"""
 
+
+def render(result) -> str:
+    rows, sdks = result["rows"], result["sdks"]
+    scored = [r for r in rows if getattr(r, "scored", True)]
+    repo = result.get("repo_url", "")
+
+    tiles = "".join(_tile(s, scored) for s in sdks)
+    axis_opts = "".join(f'<option value="{k}">{_esc(v)}</option>' for k, v in AXES.items())
+    sections = "".join(
+        _matrix(axis, title, [r for r in rows if r.capability.axis == axis], sdks,
+                result.get("indexes"))
+        for axis, title in AXES.items()
+    )
+    prov = " &middot; ".join(
+        f"{_esc(s['label'])} <code>{_esc(s['commit'])}</code>" for s in sdks)
+
+    footer = f"""<footer>
+<p>{len(scored)} capabilities scored, generated {_esc(result['generated'])}.<br>
+Product <code>{_esc(result['product']['commit'])}</code> on
+<code>{_esc(result['product']['branch'])}</code> &middot; measured against {prov}.</p>
+{_footer_links(repo)}
+</footer>"""
+
+    body = f"""<div class="wrap" style="padding-top:0">
 <div class="tiles" style="margin-bottom:18px">{tiles}</div>
 
 {_warnings(result.get("warnings"))}
 {_summary(rows, result["stale_overrides"], scored)}
 
 <div class="controls">
-  <input type="search" id="q" placeholder="Filter capabilities&hellip;" aria-label="Filter capabilities">
+  <input type="search" id="q" placeholder="Filter capabilities&hellip;"
+    aria-label="Filter capabilities">
   <select id="ax" aria-label="Axis"><option value="all">All axes</option>{axis_opts}</select>
   <select id="show" aria-label="Show">
     <option value="all">All capabilities</option>
@@ -609,14 +660,112 @@ def render(result) -> str:
 </div>
 
 {sections}
+{footer}
+</div>"""
+    return _shell("ThunderID DX Dashboard", body, repo)
 
-<footer>
-{len(scored)} capabilities scored, generated {_esc(result['generated'])}.<br>
-Product <code>{_esc(result['product']['commit'])}</code> on
-<code>{_esc(result['product']['branch'])}</code> &middot; measured against {prov}.<br>
-Each row cites the file and line it was discovered from; select a row for the evidence
-behind every cell.
-</footer>
-</div>
-<script>{JS}</script>
-</body></html>"""
+
+def render_about(result) -> str:
+    """The explainer, on its own page.
+
+    It used to sit above the tables as a disclosure. Everything on the dashboard competes
+    with the data for the first screen, and an explanation is read once and the data every
+    day, so it earns a page rather than a permanent slot.
+    """
+    repo = result.get("repo_url", "")
+    axes = "".join(
+        f"<tr><td><b>{_esc(t)}</b></td><td>{_esc(src)}</td></tr>"
+        for t, src in [
+            ("Flow executors",
+             "backend/internal/flow/executor: which ones can reach a client, "
+             "and the inputs each declares"),
+            ("Flow input types", "backend/pkg/thunderidengine/providers/constants.go"),
+            ("Flow element types",
+             "the console's element palette, frontend/apps/console/.../models/elements.ts"),
+            ("Client surface", "the Client surface tables in the SDK specification"),
+            ("Configuration keys", "the Configuration tables in the SDK specification"),
+            ("Operations beyond the specification",
+             "the union of every SDK's own client surface, minus the specified operations"),
+        ]
+    )
+    verdicts = "".join(
+        f'<tr><td><span class="pill" style="color:{m["color"]};background:{m["color"]}18;'
+        f'border-color:{m["color"]}40"><i aria-hidden="true">{m["glyph"]}</i>'
+        f'<span>{m["label"]}</span></span></td><td>{_esc(d)}</td></tr>'
+        for m, d in [
+            (STATUS[SUPPORTED], "Evidence found in the SDK's own source, cited as file and line."),
+            (STATUS[PARTIAL], "The SDK handles some of what the capability needs and would "
+                              "stall on the rest."),
+            (STATUS[MISSING], "The product can emit this and nothing in the SDK handles it."),
+            (STATUS[UNDETERMINED], "No detector can decide it. It needs a human, and says so "
+                                   "rather than guessing."),
+            (STATUS[NOT_APPLICABLE], "Cannot apply on the platform, with a stated reason, or "
+                                     "is not an SDK obligation."),
+        ]
+    )
+    body = f"""<div class="wrap prose" style="padding-top:0">
+<p><a class="back" href="index.html">&larr; Back to the dashboard</a></p>
+
+<h2>How this is measured</h2>
+<p>A flow is assembled from executors and rendered from elements the server sends to the
+client. Where an SDK cannot handle one of them, an application built on that SDK breaks at
+the step the user reaches it, and nothing before then says so. This page exists to find
+those before a user does.</p>
+
+<h3>What is measured</h3>
+<p>Nothing is hand-listed. Six axes are rediscovered from source on every run, so a
+capability added upstream appears here on the next run rather than when someone remembers
+it.</p>
+<table class="doc"><thead><tr><th>Axis</th><th>Source of truth</th></tr></thead>
+<tbody>{axes}</tbody></table>
+<p>The last axis is the one that catches a method the JavaScript SDK grew and nobody else
+did. The specification names that position as the usual origin of a parity gap, so it is
+scored like everything else rather than left to memory.</p>
+
+<h3>Which executors count</h3>
+<p>An executor is scored only when it can actually reach a client, which is decided by
+whether it emits <code>USER_INPUT_REQUIRED</code> or <code>EXTERNAL_REDIRECTION</code>.
+Go struct embedding is followed, so <code>GithubOAuthExecutor</code> inherits the verdict
+from the OAuth executor it wraps. The rest are shown as not applicable, so you can see they
+were considered rather than missed.</p>
+
+<h3>Verdicts</h3>
+<table class="doc"><tbody>{verdicts}</tbody></table>
+<p>Nothing is scored as supported without evidence. An unproven pass is worse than an open
+question, because it closes a gap nobody then looks at.</p>
+
+<h3>Columns are repositories</h3>
+<p>Each column covers every package in its repository: JavaScript is eleven, Apple and
+Android two each. A cell reads missing only when nothing in any of them has it. Expanding a
+row breaks every part down package by package, grouped by the layer each package sits at,
+so divergence inside one repository is visible: a capability in react and not in vue is as
+real a gap as one in JavaScript and not in Swift.</p>
+<p>Packages are listed whether or not they carry the part, because absence has to be read
+against the layer. No Platform package renders an input and nothing below Core Lib ships UI,
+so <code>browser</code> lacking <code>CONSENT_INPUT</code> is the architecture working,
+while <code>vue</code> lacking it is a gap. The report shows where a thing is and leaves
+that judgement to you.</p>
+
+<h3>End-to-end coverage</h3>
+<p>The <b>E2E</b> column counts how many SDK suites reference a capability at all.
+Implementation and test coverage are separate claims: an SDK can render an input that
+nothing ever exercises. Mobile suites are Maestro flows keyed on
+<code>thunderid-field-&lt;identifier&gt;</code>, which is the same identifier the executor
+declares, so a test is tied to the capability it covers rather than guessed at from a
+filename. The JavaScript suite is Playwright, matched the same way.</p>
+
+<h3>When something needs a human</h3>
+<p>Three things on the dashboard are questions rather than findings. <b>Supported by no
+SDK</b> means the product can emit it and nothing handles it, which is either the SDKs not
+catching up or a capability that was never meant to reach a client. <b>No detector yet</b>
+means it was discovered but nothing can prove an SDK handles it, usually because the
+executor builds its prompt at runtime. <b>Stale overrides</b> name a capability that no
+longer exists upstream.</p>
+<p>Judgement that derivation cannot make lives in <code>catalogue/overrides.yaml</code>, and
+only three kinds: an operation an SDK implements under a different name, a capability that
+genuinely cannot apply on a platform with its reason, and an extra detector for a capability
+with no wire literal to search for.</p>
+
+<footer>{_footer_links(repo, on_about=True)}</footer>
+</div>"""
+    return _shell("How this is measured &middot; ThunderID DX Dashboard", body, repo)

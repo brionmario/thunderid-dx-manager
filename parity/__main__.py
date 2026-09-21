@@ -104,10 +104,14 @@ def main():
         print(f"\nwrote {p}")
 
     if args.html:
-        from .report import render
+        from .report import render, render_about
         p = Path(args.html); p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(render(result))
         print(f"wrote {p}")
+        # The explainer is a sibling page, linked from every footer.
+        about = p.parent / "how-it-works.html"
+        about.write_text(render_about(result))
+        print(f"wrote {about}")
 
     if args.fail_on_gap:
         total = [r for r in result["rows"] if r.is_total_gap]

@@ -103,5 +103,6 @@ def load(config_path: Path, sources_root=None):
         "stale_overrides": analyzer.stale_overrides(),
         "product_test_files": len(product_tests.files),
         "warnings": warnings,
+        "repo_url": cfg.get("repo_url", ""),
         "indexes": indexes,
     }

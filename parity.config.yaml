@@ -13,6 +13,9 @@
 # The four SDK entries are the repos listed in the specification's repository topology.
 # Keep `id` stable: it is the column key in the report and in overrides.yaml.
 
+# This tool's own repository, linked from the footer of every page.
+repo_url: https://github.com/brionmario/thunderid-dx-manager
+
 product: /Users/brion/Desktop/thunderid/sdk-parity
 product_repo: thunder-id/thunderid
 

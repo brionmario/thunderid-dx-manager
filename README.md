@@ -96,6 +96,9 @@ pip install -r requirements.txt
 python3 -m parity --html out/index.html --json out/parity.json
 ```
 
+That writes three files: the dashboard, `how-it-works.html` beside it (the explainer, linked
+from every footer), and the machine-readable report.
+
 Point `parity.config.yaml` at your checkouts first. It is the only configuration file, and
 the workflow uses the same one with `--sources-root`: a separate CI copy drifted once and
 the published report silently showed no end-to-end coverage anywhere until someone noticed. Useful flags:
