@@ -37,6 +37,26 @@ body{margin:0;background:var(--plane);color:var(--ink);
 font:14px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif;
 padding:0 16px env(safe-area-inset-bottom,0px);}
 .wrap{max-width:1180px;margin:0 auto;padding-block:28px}
+.masthead{background:var(--surface);border-bottom:1px solid var(--rule);
+margin:0 -16px 20px;padding:0 16px;padding-top:env(safe-area-inset-top,0px)}
+.mh{padding-block:20px;display:flex;gap:20px 32px;align-items:flex-end;
+justify-content:space-between;flex-wrap:wrap}
+.mh-id h1{font-size:20px;margin:0}
+.mh-id p{margin:3px 0 0;color:var(--ink2);max-width:58ch}
+.mh-meta{display:flex;gap:26px;margin:0;flex-wrap:wrap}
+.mh-meta dt{font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted)}
+.mh-meta dd{margin:2px 0 0;font-size:12px;color:var(--ink2);
+font-variant-numeric:tabular-nums;white-space:nowrap}
+.mh-meta code{font-size:12px}
+.how{margin:0 0 16px;font-size:13px}
+.how summary{cursor:pointer;color:var(--ink2);width:fit-content;
+list-style:none;display:inline-flex;align-items:center;gap:6px}
+.how summary::-webkit-details-marker{display:none}
+.how summary::before{content:"›";display:inline-block;color:var(--muted);
+transition:transform .12s ease;font-size:15px;line-height:1}
+.how[open] summary::before{transform:rotate(90deg)}
+.how summary:hover{color:var(--ink)}
+.how p{margin:8px 0 0;color:var(--ink2);max-width:78ch}
 h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}
 h2{font-size:15px;margin:0;letter-spacing:-.005em}
 .sub{color:var(--ink2);margin:0 0 20px;max-width:70ch}
@@ -470,12 +490,29 @@ def render(result) -> str:
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ThunderID SDK Parity</title>
 <style>{CSS}</style></head>
-<body><div class="wrap">
-<h1>ThunderID SDK parity</h1>
-<p class="sub">Every capability the product can ask of an SDK, and whether each SDK answers.
-Discovered from source on each run: executors and wire constants from the server, the element
-palette from the console, the client surface and configuration keys from the SDK
-specification. Select any row for the evidence behind every cell.</p>
+<body>
+<header class="masthead"><div class="wrap mh">
+  <div class="mh-id">
+    <h1>ThunderID SDK parity</h1>
+    <p>Every capability the product can ask of an SDK, and whether each SDK answers.</p>
+  </div>
+  <dl class="mh-meta">
+    <div><dt>Product</dt><dd><code>{_esc(result['product']['commit'])}</code>
+      {_esc(result['product']['branch'])}</dd></div>
+    <div><dt>Capabilities</dt><dd>{len(scored)} scored</dd></div>
+    <div><dt>Generated</dt><dd>{_esc(result['generated'])}</dd></div>
+  </dl>
+</div></header>
+
+<div class="wrap" style="padding-top:0">
+<details class="how">
+  <summary>How this is measured</summary>
+  <p>Nothing here is hand-listed. Every run rediscovers the contract from source: the
+  executors and wire constants from the server, the element palette from the console, and
+  the client surface and configuration keys from the SDK specification. A capability is
+  marked supported only where there is a file and a line in the SDK to justify it. Select
+  any row for the evidence behind every cell.</p>
+</details>
 
 <div class="tiles" style="margin-bottom:18px">{tiles}</div>
 
@@ -496,10 +533,9 @@ specification. Select any row for the evidence behind every cell.</p>
 {sections}
 
 <footer>
-Product <code>{_esc(result['product']['commit'])}</code> on
-<code>{_esc(result['product']['branch'])}</code> &middot; {prov}<br>
-Generated {_esc(result['generated'])}. Each row cites the file and line it was discovered from;
-hover a cell for the evidence behind it.
+Measured against {prov}.<br>
+Each row cites the file and line it was discovered from; select a row for the evidence
+behind every cell.
 </footer>
 </div>
 <script>{JS}</script>
