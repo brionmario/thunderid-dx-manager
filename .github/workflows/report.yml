@@ -113,27 +113,43 @@ jobs:
       # megabytes.
       - name: Commit the snapshot
         run: |
-          mkdir -p snapshots
           stamp="$(date -u +%Y-%m-%d)"
-          cp out/snapshot.json "snapshots/$stamp.json"
-          cp out/snapshot.json snapshots/latest.json
-
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add snapshots
-
-          # Staged rather than working-tree diff: on the first run these files are untracked,
-          # and git diff does not see untracked files, so the check would pass and nothing
-          # would ever be committed.
-          if git diff --cached --quiet -- snapshots; then
-            echo "verdicts are unchanged since the last run; nothing to commit"
-            exit 0
-          fi
-
           summary="$(sed -n 's/^since /Compared against /p' run.log)"
-          git commit -m "Record SDK parity verdicts for $stamp" \
-                     -m "${summary:-No baseline was available for this run.}"
-          git push
+
+          # Two runs can finish close enough together that the second is rejected as
+          # non-fast-forward, which is how the first manual run failed. The snapshot in out/
+          # is this run's own output and out/ is ignored, so the whole commit can simply be
+          # rebuilt on top of whatever landed meanwhile and pushed again.
+          for attempt in 1 2 3; do
+            git fetch --quiet origin main
+            git reset --quiet --hard origin/main
+
+            mkdir -p snapshots
+            cp out/snapshot.json "snapshots/$stamp.json"
+            cp out/snapshot.json snapshots/latest.json
+
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add snapshots
+
+            # Staged rather than working-tree diff: on the first run these files are
+            # untracked, and git diff does not see untracked files, so the check would pass
+            # and nothing would ever be committed.
+            if git diff --cached --quiet -- snapshots; then
+              echo "verdicts are unchanged since the last run; nothing to commit"
+              exit 0
+            fi
+
+            git commit --quiet -m "Record SDK parity verdicts for $stamp" \
+                       -m "${summary:-No baseline was available for this run.}"
+            if git push --quiet; then
+              echo "committed snapshots/$stamp.json"
+              exit 0
+            fi
+            echo "push rejected on attempt $attempt; rebuilding on the new tip"
+          done
+          echo "::error::could not push the snapshot after three attempts"
+          exit 1
 
       - name: Report regressions
         run: |
