@@ -77,6 +77,24 @@ sdks:
 # separately from the SDK's own sources: a capability can be implemented and untested, and
 # the report distinguishes the two rather than treating a passing grep as proof of either.
 
+# The live side of the dashboard: open pull requests and DX issues, read through the gh
+# CLI when the report is generated. Parity is true of a commit; these are true of a moment,
+# so they are stamped with the generation time rather than a revision.
+github:
+  pull_requests:
+    repos:
+      - thunder-id/javascript-sdks
+      - thunder-id/ios-sdks
+      - thunder-id/android-sdks
+      - thunder-id/flutter-sdks
+    # Days without activity before an open pull request is called out. Drafts are exempt:
+    # an unfinished branch sitting still is not the same as a finished one waiting.
+    stale_after_days: 14
+  issues:
+    repo: thunder-id/thunderid
+    labels: ["Developer Experience"]
+    stale_after_days: 60
+
 # Source files inside the product repo. Changing a path here is how the tool survives an
 # upstream refactor, rather than by editing the extractors.
 sources:

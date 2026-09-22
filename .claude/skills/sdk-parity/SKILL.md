@@ -1,6 +1,6 @@
 ---
 name: sdk-parity
-description: Generate and triage the ThunderID cross-SDK parity report. Use when asked what is missing from an SDK, whether a flow capability is supported everywhere, what changed since the last report, or to regenerate the parity HTML. Also use after a new executor, input type, flow element, or specification row lands.
+description: Generate and triage the ThunderID DX dashboard - cross-SDK feature parity, open pull requests across the SDK repos, and open Developer Experience issues. Use when asked what is missing from an SDK, whether a flow capability is supported everywhere, what is in flight or stalled, what DX issues are outstanding, or to regenerate the dashboard. Also use after a new executor, input type, flow element, or specification row lands.
 ---
 
 # ThunderID SDK parity
@@ -29,6 +29,16 @@ not comment an SDK out, because a dropped column reads as "no gaps here".
 The counts above the tables filter them: *short in at least one SDK*, *supported by no
 SDK*, *with no detector yet*. In `out/parity.json` the same subsets are a capability whose
 `sdks` values are all `missing`, and one whose values are all `unknown`.
+
+## The live pages
+
+`pull-requests.html` and `issues.html` are read from GitHub at generation time through the
+`gh` CLI, and are in `out/parity.json` under `pullRequests` and `issues`. An idle pull
+request and an unassigned issue are findings in their own right; a change open in one SDK
+repository and nowhere else is the parity page's problem arriving early.
+
+If a live section says it could not be read, that is a failed call, not an empty result.
+Never report it as "nothing open".
 
 ## Triage, in this order
 

@@ -9,6 +9,7 @@ from pathlib import Path
 import yaml
 
 from .analyze import Analyzer
+from .github import collect as collect_github
 from .product import discover, extra_operation_capabilities
 from .sdk import SdkIndex, TestCorpus
 
@@ -85,6 +86,9 @@ def load(config_path: Path, sources_root=None):
     if ov_path.exists():
         overrides = (yaml.safe_load(ov_path.read_text()) or {}).get("overrides") or {}
 
+    live = collect_github(cfg)
+    warnings.extend(live["errors"])
+
     caps = discover(product, cfg["sources"])
     caps += extra_operation_capabilities(
         indexes, [c for c in caps if c.axis == "surface"], overrides)
@@ -104,5 +108,7 @@ def load(config_path: Path, sources_root=None):
         "product_test_files": len(product_tests.files),
         "warnings": warnings,
         "repo_url": cfg.get("repo_url", ""),
+        "pull_requests": live["pull_requests"],
+        "issues": live["issues"],
         "indexes": indexes,
     }

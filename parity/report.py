@@ -82,6 +82,15 @@ justify-content:space-between;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:9px;margin:0;font-size:16px;font-weight:500;
 letter-spacing:-.01em;color:var(--ink)}
 .brand .mark{height:22px;width:auto;flex:none;display:block}
+.nav{display:flex;gap:2px;flex-wrap:wrap;margin-right:auto}
+.nav a,.nav span{display:inline-flex;align-items:center;gap:6px;font-size:13px;
+padding:5px 10px;border-radius:7px;text-decoration:none;color:var(--ink2);white-space:nowrap}
+.nav a:hover{background:var(--plane);color:var(--ink)}
+.nav .on{background:var(--plane);color:var(--ink);font-weight:600}
+.nav em{font-style:normal;font-size:11px;font-variant-numeric:tabular-nums;
+color:var(--muted);background:var(--plane);border:1px solid var(--grid);
+border-radius:999px;padding:0 5px}
+.nav .on em{background:var(--surface)}
 /* A hairline divider reads as "ThunderID, and this is its DX Dashboard" rather than
    running the product name into the wordmark. */
 .brand span{padding-left:9px;border-left:1px solid var(--rule);line-height:1.1}
@@ -210,6 +219,10 @@ ul.alert code{font-size:12px}
 footer{color:var(--muted);font-size:12px;margin:22px 0 8px;line-height:1.7}
 footer p{margin:0 0 8px}
 footer code{font-size:11px}
+.flag{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--crit);
+border:1px solid var(--crit);border-radius:4px;padding:0 4px;vertical-align:1px}
+td.cap a{text-decoration:none;color:inherit;border-bottom:1px solid var(--grid)}
+td.cap a:hover{border-bottom-color:var(--rule)}
 .flinks{display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 .flinks a{display:inline-flex;align-items:center;gap:6px;color:var(--ink2);
 text-decoration:none;border-bottom:1px solid var(--grid);padding-bottom:1px}
@@ -577,9 +590,27 @@ def _footer_links(repo_url, on_about=False):
     return f'<p class="flinks">{"".join(links)}</p>' if links else ""
 
 
-def _shell(title, body, repo_url, scripts=True):
+PAGES = [("index.html", "Feature parity"),
+         ("pull-requests.html", "Pull requests"),
+         ("issues.html", "DX issues")]
+
+
+def _nav(current, counts):
+    """The three things the dashboard tracks, with how much of each is outstanding."""
+    items = []
+    for href, label in PAGES:
+        n = counts.get(href)
+        badge = f'<em>{n}</em>' if n is not None else ""
+        if href == current:
+            items.append(f'<span class="on">{_esc(label)}{badge}</span>')
+        else:
+            items.append(f'<a href="{href}">{_esc(label)}{badge}</a>')
+    return f'<nav class="nav">{"".join(items)}</nav>'
+
+
+def _shell(title, body, repo_url, nav="", scripts=True):
     """The page frame: head, theme bootstrap, masthead. Shared by every page so the
-    dashboard and its explainer cannot drift apart visually."""
+    dashboard, the trackers and the explainer cannot drift apart visually."""
     return f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
@@ -601,6 +632,7 @@ def _shell(title, body, repo_url, scripts=True):
 <body>
 <header class="masthead"><div class="wrap mh">
   <h1 class="brand">{LOGO}<span>DX Dashboard</span></h1>
+  {nav}
   <span class="seg" role="group" aria-label="Colour theme">
     <button type="button" data-set-theme="auto">Auto</button
     ><button type="button" data-set-theme="light">Light</button
@@ -656,7 +688,7 @@ Product <code>{_esc(result['product']['commit'])}</code> on
 {sections}
 {footer}
 </div>"""
-    return _shell("ThunderID DX Dashboard", body, repo)
+    return _shell("ThunderID DX Dashboard", body, repo, _nav("index.html", _counts(result)))
 
 
 def render_about(result) -> str:
@@ -761,4 +793,178 @@ with no wire literal to search for.</p>
 
 <footer>{_footer_links(repo, on_about=True)}</footer>
 </div>"""
-    return _shell("How this is measured &middot; ThunderID DX Dashboard", body, repo)
+    return _shell("How this is measured &middot; ThunderID DX Dashboard", body, repo,
+                  _nav("", _counts(result)))
+
+
+# ------------------------------------------------------------------ live trackers
+
+def _counts(result):
+    """Nav badges: what is outstanding on each page, or nothing when it could not be read."""
+    scored = [r for r in result["rows"] if getattr(r, "scored", True)]
+    out = {"index.html": sum(1 for r in scored if r.is_gap)}
+    if result.get("pull_requests") is not None:
+        out["pull-requests.html"] = len(result["pull_requests"])
+    if result.get("issues") is not None:
+        out["issues.html"] = len(result["issues"])
+    return out
+
+
+def _unavailable(what):
+    return (f'<section class="card"><p class="empty" style="padding:22px 16px">'
+            f'{_esc(what)} could not be read from GitHub on this run. The warning at the top '
+            f'of the page says why. This is not the same as there being none.</p></section>')
+
+
+def _comments(n):
+    if not n:
+        return ""
+    return f' &middot; {n} comment' + ("s" if n != 1 else "")
+
+
+def _age(days):
+    if days < 1:
+        return "today"
+    if days == 1:
+        return "1 day"
+    if days < 60:
+        return f"{days} days"
+    return f"{days // 30} months"
+
+
+REVIEW_LABEL = {
+    "REVIEW_REQUIRED": ("Review required", STATUS[UNDETERMINED]["color"]),
+    "CHANGES_REQUESTED": ("Changes requested", STATUS[MISSING]["color"]),
+    "APPROVED": ("Approved", STATUS[SUPPORTED]["color"]),
+    "": ("No reviewers", "var(--muted)"),
+}
+
+
+def render_pulls(result) -> str:
+    """Open pull requests across the SDK repositories."""
+    repo = result.get("repo_url", "")
+    prs = result.get("pull_requests")
+    nav = _nav("pull-requests.html", _counts(result))
+
+    if prs is None:
+        body = f'<div class="wrap" style="padding-top:0">{_warnings(result.get("warnings"))}' \
+               f'{_unavailable("Open pull requests")}</div>'
+        return _shell("Pull requests \u00b7 ThunderID DX Dashboard", body, repo, nav)
+
+    stale = [p for p in prs if p["stale"]]
+    drafts = [p for p in prs if p["draft"]]
+    stale_style = f' style="color:{STATUS[MISSING]["color"]}"' if stale else ""
+    chips = (f'<div class="summary">'
+             f'<span class="chip"><b>{len(prs)}</b> open</span>'
+             f'<span class="chip"{stale_style}><b>{len(stale)}</b> idle over the threshold</span>'
+             f'<span class="chip"><b>{len(drafts)}</b> draft</span>'
+             f'</div>')
+
+    rows = []
+    for p in prs:
+        label, colour = REVIEW_LABEL.get(p["review"], (p["review"].title(), "var(--muted)"))
+        if p["draft"]:
+            label, colour = "Draft", "var(--muted)"
+        flag = (' <span class="flag">idle</span>') if p["stale"] else ""
+        rows.append(
+            f'<tr><td class="cap"><b><a href="{_esc(p["url"])}" target="_blank" '
+            f'rel="noopener">{_esc(p["title"])}</a></b>{flag}'
+            f'<span class="origin">{_esc(p["repo"])} #{p["number"]} &middot; '
+            f'{_esc(p["author"])} &middot; +{p["additions"]} &minus;{p["deletions"]}</span></td>'
+            f'<td class="st" style="width:150px"><span class="pill" '
+            f'style="color:{colour};background:{colour}18;border-color:{colour}40">'
+            f'{_esc(label)}</span></td>'
+            f'<td class="tested" style="width:90px">{_esc(_age(p["opened_days"]))}</td>'
+            f'<td class="tested" style="width:90px'
+            f'{";color:" + STATUS[MISSING]["color"] if p["stale"] else ""}">'
+            f'{_esc(_age(p["idle_days"]))}</td></tr>'
+        )
+
+    table = f"""<section class="card">
+  <header><h2>Open pull requests</h2>
+    <span class="count">{len(prs)} across {len({p["repo"] for p in prs})} repositories</span>
+  </header>
+  <div class="scroll"><table>
+    <thead><tr><th>Pull request</th><th>Review</th><th>Opened</th><th>Idle</th></tr></thead>
+    <tbody>{"".join(rows) or '<tr><td colspan="4" class="empty">No open pull requests.</td></tr>'}</tbody>
+  </table></div>
+</section>"""
+
+    body = f"""<div class="wrap" style="padding-top:0">
+{_warnings(result.get("warnings"))}
+<p class="sub">Every open pull request in the four SDK repositories. A change that ships in
+one SDK is the moment the others fall behind, so what is in flight is part of the parity
+picture rather than separate from it.</p>
+{chips}
+{table}
+<footer><p>Read from GitHub at {_esc(result['generated'])}.</p>{_footer_links(repo)}</footer>
+</div>"""
+    return _shell("Pull requests \u00b7 ThunderID DX Dashboard", body, repo, nav)
+
+
+def render_issues(result) -> str:
+    """Open Developer Experience issues."""
+    repo = result.get("repo_url", "")
+    items = result.get("issues")
+    nav = _nav("issues.html", _counts(result))
+
+    if items is None:
+        body = f'<div class="wrap" style="padding-top:0">{_warnings(result.get("warnings"))}' \
+               f'{_unavailable("DX issues")}</div>'
+        return _shell("DX issues \u00b7 ThunderID DX Dashboard", body, repo, nav)
+
+    unassigned = [i for i in items if not i["assignees"]]
+    stale = [i for i in items if i["stale"]]
+    chips = (f'<div class="summary">'
+             f'<span class="chip"><b>{len(items)}</b> open</span>'
+             f'<span class="chip"><b>{len(unassigned)}</b> unassigned</span>'
+             f'<span class="chip"><b>{len(stale)}</b> quiet for months</span>'
+             f'</div>')
+
+    by_kind = {}
+    for i in items:
+        by_kind.setdefault(i["kind"] or "Unclassified", []).append(i)
+
+    rows = []
+    for kind in sorted(by_kind, key=lambda k: (k == "Unclassified", k)):
+        group = by_kind[kind]
+        rows.append(f'<tr class="grp"><td colspan="4">{_esc(kind)} '
+                    f'<span style="text-transform:none;letter-spacing:0">'
+                    f'&middot; {len(group)}</span></td></tr>')
+        for i in group:
+            who = ", ".join(i["assignees"]) if i["assignees"] else "unassigned"
+            tags = " ".join(f'<span class="pk">{_esc(t)}</span>'
+                            for t in [i["theme"], i["priority"]] if t)
+            flag = ' <span class="flag">quiet</span>' if i["stale"] else ""
+            rows.append(
+                f'<tr><td class="cap"><b><a href="{_esc(i["url"])}" target="_blank" '
+                f'rel="noopener">{_esc(i["title"])}</a></b>{flag}'
+                f'<span class="origin">#{i["number"]} &middot; {_esc(who)}'
+                f'{_comments(i["comments"])}'
+                f'</span></td>'
+                f'<td class="st" style="width:170px;text-align:left">{tags}</td>'
+                f'<td class="tested" style="width:130px">'
+                f'{_esc(i["milestone"] or "no milestone")}</td>'
+                f'<td class="tested" style="width:90px">{_esc(_age(i["opened_days"]))}</td></tr>'
+            )
+
+    table = f"""<section class="card">
+  <header><h2>Open DX issues</h2>
+    <span class="count">{_esc(result.get('issues_source', 'thunder-id/thunderid'))},
+      labelled Developer Experience</span></header>
+  <div class="scroll"><table>
+    <thead><tr><th>Issue</th><th>Tags</th><th>Milestone</th><th>Opened</th></tr></thead>
+    <tbody>{"".join(rows) or '<tr><td colspan="4" class="empty">No open issues.</td></tr>'}</tbody>
+  </table></div>
+</section>"""
+
+    body = f"""<div class="wrap" style="padding-top:0">
+{_warnings(result.get("warnings"))}
+<p class="sub">Everything labelled Developer Experience, grouped by type. These are the
+gaps someone has already written down, as against the ones on the parity page, which
+nobody had to.</p>
+{chips}
+{table}
+<footer><p>Read from GitHub at {_esc(result['generated'])}.</p>{_footer_links(repo)}</footer>
+</div>"""
+    return _shell("DX issues \u00b7 ThunderID DX Dashboard", body, repo, nav)

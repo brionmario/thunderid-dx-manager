@@ -45,6 +45,8 @@ def to_json(result):
         "product": result["product"],
         "sdks": result["sdks"],
         "staleOverrides": result["stale_overrides"],
+        "pullRequests": result.get("pull_requests"),
+        "issues": result.get("issues"),
         "capabilities": [
             {
                 "axis": r.capability.axis,
@@ -104,14 +106,17 @@ def main():
         print(f"\nwrote {p}")
 
     if args.html:
-        from .report import render, render_about
+        from .report import render, render_about, render_issues, render_pulls
         p = Path(args.html); p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(render(result))
         print(f"wrote {p}")
         # The explainer is a sibling page, linked from every footer.
-        about = p.parent / "how-it-works.html"
-        about.write_text(render_about(result))
-        print(f"wrote {about}")
+        for name, fn in (("pull-requests.html", render_pulls),
+                         ("issues.html", render_issues),
+                         ("how-it-works.html", render_about)):
+            sibling = p.parent / name
+            sibling.write_text(fn(result))
+            print(f"wrote {sibling}")
 
     if args.fail_on_gap:
         total = [r for r in result["rows"] if r.is_total_gap]

@@ -86,7 +86,12 @@ jobs:
       # One configuration file, repointed at the checkouts above. A second CI-only copy
       # drifted from the local one once and silently reported no end-to-end coverage
       # anywhere, so there is no second copy any more.
+      # Open pull requests and DX issues are read through the gh CLI, which is preinstalled
+      # on the runner. The default token reads public repositories, which is all of them; a
+      # SOURCES_TOKEN is only needed if one becomes private.
       - name: Generate the report
+        env:
+          GH_TOKEN: ${{ secrets.SOURCES_TOKEN || github.token }}
         run: |
           python3 -m parity --sources-root sources \
             --html out/index.html --json out/parity.json | tee run.log

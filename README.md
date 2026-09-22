@@ -1,6 +1,18 @@
 # thunderid-dx-manager
 
-Tracks what the ThunderID product can ask of an SDK, and whether each SDK answers.
+Tracks the three things that decide whether building on a ThunderID SDK goes well: whether
+the SDKs can do what the product asks of them, what is in flight, and what is already
+written down as broken.
+
+| Page | What it answers |
+|---|---|
+| Feature parity | Can every SDK handle everything the product can send it? |
+| Pull requests | What is open across the four SDK repositories, and what has gone quiet? |
+| DX issues | What is open in `thunder-id/thunderid` under the Developer Experience label? |
+
+Parity is derived from source and is true of a commit. The other two are read from GitHub
+when the report is generated and are true of a moment, so they are stamped with that time
+rather than a revision.
 
 A flow is assembled from executors and rendered from elements the server sends to the
 client. If the server can emit something an SDK does not handle, an application built on
@@ -90,8 +102,10 @@ pip install -r requirements.txt
 python3 -m parity --html out/index.html --json out/parity.json
 ```
 
-That writes three files: the dashboard, `how-it-works.html` beside it (the explainer, linked
-from every footer), and the machine-readable report.
+That writes the three pages, the explainer at `how-it-works.html`, and the machine-readable
+report. The two live pages go through the `gh` CLI, so they need it installed and logged in;
+if a call fails the page says so and a warning goes to the top rather than the section
+quietly reading zero.
 
 Point `parity.config.yaml` at your checkouts first. It is the only configuration file, and
 the workflow uses the same one with `--sources-root`: a separate CI copy drifted once and
