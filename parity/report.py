@@ -203,6 +203,19 @@ border-radius:9px;padding:11px 14px;margin:0 0 14px;font-size:13px}
 .warn b{display:block;font-size:11px;text-transform:uppercase;letter-spacing:.06em;
 color:var(--crit);margin-bottom:4px}
 .warn ul{margin:0;padding-left:18px;color:var(--ink2)}
+.changes{margin:0 0 16px}
+.changes h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--ink2);
+margin:0 0 8px}
+.chgs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px}
+.chg{background:var(--surface);border:1px solid var(--ring);border-radius:9px;padding:11px 13px}
+.chg.bad{border-color:#d03b3b60;border-left:3px solid #d03b3b}
+.chg.warn2{border-color:#fab21980;border-left:3px solid #fab219}
+.chg b{display:block;font-size:13px;margin-bottom:2px}
+.chg p{margin:0 0 6px;color:var(--ink2);font-size:12px}
+.chg ul{margin:0;padding-left:16px;font-size:12px;color:var(--ink2)}
+.chg li{margin:2px 0}
+.chg code{font-size:11.5px}
+.nochange{color:var(--muted);font-size:12px;margin:0 0 14px}
 .summary{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 14px}
 .chip{display:inline-flex;align-items:baseline;gap:5px;font-size:12px;color:var(--ink2);
 background:var(--surface);border:1px solid var(--ring);border-radius:999px;padding:5px 11px}
@@ -530,6 +543,62 @@ def _warnings(warnings):
     return (f'<div class="warn"><b>Check the configuration</b><ul>{items}</ul></div>')
 
 
+def _plural(n, one, many):
+    return f"{n} {one if n == 1 else many}"
+
+
+def _changes(d):
+    """What moved since the last run.
+
+    Regressions come first and are the only thing on this page allowed to interrupt: a
+    capability an SDK used to handle and no longer does is a break, where a new gap is the
+    product moving ahead, which is expected. Both are shown; only one is alarming.
+    """
+    if not d:
+        return ""
+    regressions, added = d.get("regressions", []), d.get("added", [])
+    improvements, removed = d.get("improvements", []), d.get("removed", [])
+    new_short = [a for a in added if a["gaps"]]
+    if not any((regressions, added, improvements, removed)):
+        since = _esc(d.get("baseline", {}).get("generated", "the last run"))
+        return (f'<p class="nochange">Nothing changed since {since}.</p>')
+
+    blocks = []
+    if regressions:
+        items = "".join(
+            f'<li><b>{_esc(r["sdk"])}</b> &middot; <code>{_esc(r["name"])}</code> '
+            f'{_esc(STATUS[r["from"]]["label"].lower())} &rarr; '
+            f'{_esc(STATUS[r["to"]]["label"].lower())}</li>'
+            for r in regressions[:12])
+        blocks.append(
+            f'<div class="chg bad"><b>{_plural(len(regressions), "regression", "regressions")}'
+            f'</b><p>Handled before, not handled now.</p><ul>{items}</ul></div>')
+    if new_short:
+        items = "".join(
+            f'<li><code>{_esc(a["name"])}</code> &middot; short in '
+            f'{_esc(", ".join(a["gaps"]))}</li>' for a in new_short[:12])
+        blocks.append(
+            f'<div class="chg warn2"><b>'
+            f'{_plural(len(new_short), "new capability", "new capabilities")} '
+            f'already short</b>'
+            f'<p>The product grew these since the last run and the SDKs have not caught '
+            f'up.</p><ul>{items}</ul></div>')
+    quiet = []
+    if improvements:
+        quiet.append(_plural(len(improvements), "improvement", "improvements"))
+    if removed:
+        quiet.append(_plural(len(removed), "capability", "capabilities")
+                     + " no longer discovered")
+    if len(added) > len(new_short):
+        quiet.append(f'{len(added) - len(new_short)} new and already supported')
+    if quiet:
+        blocks.append(f'<div class="chg"><b>Also</b><p>{_esc(", ".join(quiet))}.</p></div>')
+
+    since = _esc(d.get("baseline", {}).get("generated", "the last run"))
+    return (f'<section class="changes"><h2>Since {since}</h2>'
+            f'<div class="chgs">{"".join(blocks)}</div></section>')
+
+
 def _summary(rows, stale, scored):
     """One line of counts, each one a filter on the tables below.
 
@@ -671,6 +740,7 @@ Product <code>{_esc(result['product']['commit'])}</code> on
 <div class="tiles" style="margin-bottom:18px">{tiles}</div>
 
 {_warnings(result.get("warnings"))}
+{_changes(result.get("diff"))}
 {_summary(rows, result["stale_overrides"], scored)}
 
 <div class="controls">

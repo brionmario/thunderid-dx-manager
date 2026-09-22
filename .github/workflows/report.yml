@@ -11,7 +11,7 @@ name: Parity report
 
 on:
   schedule:
-    - cron: "0 6 * * *"   # daily, 06:00 UTC
+    - cron: "0 6 * * 1"   # Mondays, 06:00 UTC
   workflow_dispatch:
     inputs:
       product_ref:
@@ -26,7 +26,7 @@ on:
       - ".github/workflows/report.yml"
 
 permissions:
-  contents: read
+  contents: write   # the run commits its snapshot, which is what the next run compares against
   pages: write
   id-token: write
 
@@ -40,6 +40,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The previous snapshot has to be on disk to compare against, and the commit at
+          # the end needs somewhere to push to.
+          fetch-depth: 0
 
       - name: Check out the product
         uses: actions/checkout@v4
@@ -89,15 +93,52 @@ jobs:
       # Open pull requests and DX issues are read through the gh CLI, which is preinstalled
       # on the runner. The default token reads public repositories, which is all of them; a
       # SOURCES_TOKEN is only needed if one becomes private.
+      # snapshots/latest.json is the previous run's verdicts, committed by that run. It is
+      # read before being overwritten, so each run is compared against the one before it.
       - name: Generate the report
         env:
           GH_TOKEN: ${{ secrets.SOURCES_TOKEN || github.token }}
         run: |
           python3 -m parity --sources-root sources \
+            --baseline snapshots/latest.json \
+            --snapshot out/snapshot.json \
             --html out/index.html --json out/parity.json | tee run.log
           if grep -q '^warning:' run.log; then
             echo "::error::the report generated with warnings; see the log above"
             exit 1
+          fi
+
+      # Keeping every snapshot is what makes a comparison possible over any span, not just
+      # against last week. They hold verdicts only, so a year of them is a couple of
+      # megabytes.
+      - name: Commit the snapshot
+        run: |
+          mkdir -p snapshots
+          stamp="$(date -u +%Y-%m-%d)"
+          cp out/snapshot.json "snapshots/$stamp.json"
+          cp out/snapshot.json snapshots/latest.json
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add snapshots
+
+          # Staged rather than working-tree diff: on the first run these files are untracked,
+          # and git diff does not see untracked files, so the check would pass and nothing
+          # would ever be committed.
+          if git diff --cached --quiet -- snapshots; then
+            echo "verdicts are unchanged since the last run; nothing to commit"
+            exit 0
+          fi
+
+          summary="$(sed -n 's/^since /Compared against /p' run.log)"
+          git commit -m "Record SDK parity verdicts for $stamp" \
+                     -m "${summary:-No baseline was available for this run.}"
+          git push
+
+      - name: Report regressions
+        run: |
+          if grep -q '^regression:' run.log; then
+            grep '^regression:' run.log | while read -r line; do echo "::warning::$line"; done
           fi
 
       - uses: actions/upload-pages-artifact@v3

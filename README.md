@@ -95,6 +95,31 @@ every part and the report does not pretend to know which absences are deliberate
 Nothing is scored *Supported* without evidence. An unproven pass is worse than an open
 question, because it closes a gap nobody then looks at.
 
+## What changed since last week
+
+The dashboard rebuilds every Monday at 06:00 UTC and commits its verdicts to
+`snapshots/<date>.json`, so the next run has something to compare against. The parity page
+then opens with what moved, in two kinds that are not the same thing:
+
+- **Regressions.** A capability an SDK handled before and does not handle now. This is a
+  break, and the run raises a workflow warning for each one.
+- **New capabilities already short.** The product grew something and the SDKs have not
+  caught up. Expected, and still has to be caught.
+
+Improvements and capabilities no longer discovered are reported quietly below those.
+
+A snapshot holds verdicts only, not evidence, because it is written every week and kept
+forever while the file paths behind a verdict churn without the verdict changing. Each is
+about 28KB, so a year of them is under two megabytes. Keeping all of them means a comparison
+can be made over any span, not only against last week:
+
+```sh
+python3 -m parity --baseline snapshots/2026-08-04.json --html out/index.html
+```
+
+A regression is a warning rather than a failure: the run still publishes the report that
+documents the break. `--fail-on-regression` makes it an error where that is wanted.
+
 ## Running it
 
 ```sh
@@ -113,6 +138,8 @@ the published report silently showed no end-to-end coverage anywhere until someo
 
 ```sh
 python3 -m parity --sources-root src   # every repo under src/, named after its upstream
+python3 -m parity --baseline snapshots/latest.json   # report what changed since that run
+python3 -m parity --snapshot out/snapshot.json       # record this run's verdicts
 python3 -m parity --axis executor      # one axis, as a text table
 python3 -m parity --quiet --json -     # machine-readable only
 python3 -m parity --fail-on-gap        # non-zero exit when something has no SDK at all

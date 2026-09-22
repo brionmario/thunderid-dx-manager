@@ -88,6 +88,12 @@ def main():
     ap.add_argument("--html", metavar="PATH", help="write the HTML report")
     ap.add_argument("--json", metavar="PATH", help="write the machine-readable report")
     ap.add_argument("--quiet", action="store_true", help="suppress the text summary")
+    ap.add_argument("--snapshot", metavar="PATH",
+                    help="write this run's verdicts, for a later run to compare against")
+    ap.add_argument("--baseline", metavar="PATH",
+                    help="a snapshot from an earlier run; the report reports what changed")
+    ap.add_argument("--fail-on-regression", action="store_true",
+                    help="exit non-zero when a capability an SDK used to handle regressed")
     ap.add_argument("--fail-on-gap", action="store_true",
                     help="exit non-zero when any scored capability is missing everywhere")
     args = ap.parse_args()
@@ -96,6 +102,16 @@ def main():
 
     for w in result["warnings"]:
         print(f"warning: {w}")
+
+    # The comparison has to happen before the snapshot is written, or a run whose snapshot
+    # and baseline are the same path would compare against itself and never see a change.
+    from . import snapshot as snap
+    current = snap.build(result)
+    baseline = snap.load(args.baseline) if args.baseline else None
+    result["diff"] = snap.diff(baseline, current)
+    if args.baseline:
+        print(f"since {baseline['generated'] if baseline else 'no baseline'}: "
+              f"{snap.summarize(result['diff'])}")
 
     if not args.quiet:
         summarize(result, args.axis)
@@ -117,6 +133,16 @@ def main():
             sibling = p.parent / name
             sibling.write_text(fn(result))
             print(f"wrote {sibling}")
+
+    if args.snapshot:
+        sp = Path(args.snapshot); sp.parent.mkdir(parents=True, exist_ok=True)
+        sp.write_text(json.dumps(current, indent=2, sort_keys=True) + "\n")
+        print(f"wrote {sp}")
+
+    if args.fail_on_regression and result["diff"].get("regressions"):
+        for r in result["diff"]["regressions"]:
+            print(f"regression: {r['name']} on {r['sdk']}: {r['from']} -> {r['to']}")
+        return 1
 
     if args.fail_on_gap:
         total = [r for r in result["rows"] if r.is_total_gap]

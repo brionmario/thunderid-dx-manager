@@ -40,6 +40,19 @@ repository and nowhere else is the parity page's problem arriving early.
 If a live section says it could not be read, that is a failed call, not an empty result.
 Never report it as "nothing open".
 
+## What changed since last week
+
+`snapshots/` holds one file of verdicts per weekly run. Compare against any of them:
+
+```sh
+python3 -m parity --baseline snapshots/2026-08-04.json --quiet
+```
+
+A **regression** is a capability an SDK handled before and does not now, and is the first
+thing to chase: something broke. A **new capability already short** is the product moving
+ahead, which is expected. Do not report them as the same finding, and do not read a falling
+percentage as a regression: the denominator grows whenever the product does.
+
 ## Triage, in this order
 
 1. **Supported by no SDK.** The product can emit it and nothing handles it. Decide which:
