@@ -94,9 +94,9 @@
       "axis": "config",
       "name": "endpoints",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
-        "ios": "missing",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -117,6 +117,16 @@
         "android": "missing",
         "flutter": "missing",
         "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:http": {
+      "axis": "config",
+      "name": "http",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -277,406 +287,6 @@
         "android": "supported",
         "flutter": "supported",
         "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "element:ACTION": {
-      "axis": "element",
-      "name": "ACTION",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "element:CAPTCHA": {
-      "axis": "element",
-      "name": "CAPTCHA",
-      "sdks": {
-        "android": "na",
-        "flutter": "na",
-        "ios": "na",
-        "javascript": "missing"
-      }
-    },
-    "element:CHECKBOX": {
-      "axis": "element",
-      "name": "CHECKBOX",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:CONSENT": {
-      "axis": "element",
-      "name": "CONSENT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:CONSENT_INPUT": {
-      "axis": "element",
-      "name": "CONSENT_INPUT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "missing"
-      }
-    },
-    "element:DATE_INPUT": {
-      "axis": "element",
-      "name": "DATE_INPUT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:DIVIDER": {
-      "axis": "element",
-      "name": "DIVIDER",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "element:DROPDOWN": {
-      "axis": "element",
-      "name": "DROPDOWN",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "missing"
-      }
-    },
-    "element:EMAIL_INPUT": {
-      "axis": "element",
-      "name": "EMAIL_INPUT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "supported",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:ICON": {
-      "axis": "element",
-      "name": "ICON",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:IMAGE": {
-      "axis": "element",
-      "name": "IMAGE",
-      "sdks": {
-        "android": "missing",
-        "flutter": "supported",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:NUMBER_INPUT": {
-      "axis": "element",
-      "name": "NUMBER_INPUT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "supported",
-        "ios": "missing",
-        "javascript": "missing"
-      }
-    },
-    "element:OTP_INPUT": {
-      "axis": "element",
-      "name": "OTP_INPUT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:PASSWORD_INPUT": {
-      "axis": "element",
-      "name": "PASSWORD_INPUT",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "element:PHONE_INPUT": {
-      "axis": "element",
-      "name": "PHONE_INPUT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:QR_CODE": {
-      "axis": "element",
-      "name": "QR_CODE",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:RESEND": {
-      "axis": "element",
-      "name": "RESEND",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "missing"
-      }
-    },
-    "element:RICH_TEXT": {
-      "axis": "element",
-      "name": "RICH_TEXT",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "element:SELECT": {
-      "axis": "element",
-      "name": "SELECT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:STACK": {
-      "axis": "element",
-      "name": "STACK",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:TEXT": {
-      "axis": "element",
-      "name": "TEXT",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "element:TEXT_INPUT": {
-      "axis": "element",
-      "name": "TEXT_INPUT",
-      "sdks": {
-        "android": "missing",
-        "flutter": "supported",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "element:TIMER": {
-      "axis": "element",
-      "name": "TIMER",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "executor:ConsentExecutor": {
-      "axis": "executor",
-      "name": "ConsentExecutor",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "partial"
-      }
-    },
-    "executor:CredentialSetter": {
-      "axis": "executor",
-      "name": "CredentialSetter",
-      "sdks": {
-        "android": "unknown",
-        "flutter": "unknown",
-        "ios": "unknown",
-        "javascript": "unknown"
-      }
-    },
-    "executor:CredentialsAuthExecutor": {
-      "axis": "executor",
-      "name": "CredentialsAuthExecutor",
-      "sdks": {
-        "android": "partial",
-        "flutter": "supported",
-        "ios": "partial",
-        "javascript": "supported"
-      }
-    },
-    "executor:FederatedAuthResolverExecutor": {
-      "axis": "executor",
-      "name": "FederatedAuthResolverExecutor",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "missing"
-      }
-    },
-    "executor:GithubOAuthExecutor": {
-      "axis": "executor",
-      "name": "GithubOAuthExecutor",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "executor:GoogleOIDCAuthExecutor": {
-      "axis": "executor",
-      "name": "GoogleOIDCAuthExecutor",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "executor:IdentifyingExecutor": {
-      "axis": "executor",
-      "name": "IdentifyingExecutor",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "executor:InviteExecutor": {
-      "axis": "executor",
-      "name": "InviteExecutor",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "partial"
-      }
-    },
-    "executor:MagicLinkExecutor": {
-      "axis": "executor",
-      "name": "MagicLinkExecutor",
-      "sdks": {
-        "android": "partial",
-        "flutter": "partial",
-        "ios": "partial",
-        "javascript": "partial"
-      }
-    },
-    "executor:OAuthExecutor": {
-      "axis": "executor",
-      "name": "OAuthExecutor",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "executor:OIDCAuthExecutor": {
-      "axis": "executor",
-      "name": "OIDCAuthExecutor",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "executor:OTPExecutor": {
-      "axis": "executor",
-      "name": "OTPExecutor",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "executor:OUExecutor": {
-      "axis": "executor",
-      "name": "OUExecutor",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "partial"
-      }
-    },
-    "executor:OUResolverExecutor": {
-      "axis": "executor",
-      "name": "OUResolverExecutor",
-      "sdks": {
-        "android": "partial",
-        "flutter": "partial",
-        "ios": "partial",
-        "javascript": "supported"
-      }
-    },
-    "executor:OpenID4VPVerifyExecutor": {
-      "axis": "executor",
-      "name": "OpenID4VPVerifyExecutor",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
-        "javascript": "supported"
-      }
-    },
-    "executor:PasskeyAuthExecutor": {
-      "axis": "executor",
-      "name": "PasskeyAuthExecutor",
-      "sdks": {
-        "android": "supported",
-        "flutter": "supported",
-        "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "executor:UserTypeResolver": {
-      "axis": "executor",
-      "name": "UserTypeResolver",
-      "sdks": {
-        "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
         "javascript": "supported"
       }
     },
@@ -925,7 +535,7 @@
       "name": "updateUserCredentials",
       "sdks": {
         "android": "supported",
-        "flutter": "missing",
+        "flutter": "supported",
         "ios": "supported",
         "javascript": "supported"
       }
@@ -1048,6 +658,16 @@
         "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
+      }
+    },
+    "input:USER_SELECT": {
+      "axis": "input",
+      "name": "USER_SELECT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
       }
     },
     "surface:clearSession": {
@@ -1231,15 +851,15 @@
       }
     }
   },
-  "generated": "2026-09-22 06:55 UTC",
+  "generated": "2026-09-28 13:22 UTC",
   "product": {
     "branch": "main",
-    "commit": "91ae7d7"
+    "commit": "b92dff0"
   },
   "sdks": {
-    "android": "75ab51a",
-    "flutter": "20638a3",
-    "ios": "ebe9d8d",
-    "javascript": "172f9e0"
+    "android": "bede1cc",
+    "flutter": "41661a5",
+    "ios": "004ec0b",
+    "javascript": "3e6b002"
   }
 }
