@@ -1,0 +1,865 @@
+{
+  "capabilities": {
+    "config:afterSignInUrl": {
+      "axis": "config",
+      "name": "afterSignInUrl",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:afterSignOutUrl": {
+      "axis": "config",
+      "name": "afterSignOutUrl",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:allowedExternalUrls": {
+      "axis": "config",
+      "name": "allowedExternalUrls",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:applicationId": {
+      "axis": "config",
+      "name": "applicationId",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:baseUrl": {
+      "axis": "config",
+      "name": "baseUrl",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:clientId": {
+      "axis": "config",
+      "name": "clientId",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:clientSecret": {
+      "axis": "config",
+      "name": "clientSecret",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:components": {
+      "axis": "config",
+      "name": "components",
+      "sdks": {
+        "android": "na",
+        "flutter": "supported",
+        "ios": "na",
+        "javascript": "supported"
+      }
+    },
+    "config:discovery": {
+      "axis": "config",
+      "name": "discovery",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:endpoints": {
+      "axis": "config",
+      "name": "endpoints",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:extensions": {
+      "axis": "config",
+      "name": "extensions",
+      "sdks": {
+        "android": "na",
+        "flutter": "missing",
+        "ios": "na",
+        "javascript": "supported"
+      }
+    },
+    "config:grantType": {
+      "axis": "config",
+      "name": "grantType",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:http": {
+      "axis": "config",
+      "name": "http",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:instanceId": {
+      "axis": "config",
+      "name": "instanceId",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:mode": {
+      "axis": "config",
+      "name": "mode",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:organizationChain": {
+      "axis": "config",
+      "name": "organizationChain",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:organizationHandle": {
+      "axis": "config",
+      "name": "organizationHandle",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:preferences": {
+      "axis": "config",
+      "name": "preferences",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:scopes": {
+      "axis": "config",
+      "name": "scopes",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:signInOptions": {
+      "axis": "config",
+      "name": "signInOptions",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:signInUrl": {
+      "axis": "config",
+      "name": "signInUrl",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:signOutOptions": {
+      "axis": "config",
+      "name": "signOutOptions",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:signUpOptions": {
+      "axis": "config",
+      "name": "signUpOptions",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:signUpUrl": {
+      "axis": "config",
+      "name": "signUpUrl",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:storage": {
+      "axis": "config",
+      "name": "storage",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "config:syncSession": {
+      "axis": "config",
+      "name": "syncSession",
+      "sdks": {
+        "android": "na",
+        "flutter": "na",
+        "ios": "na",
+        "javascript": "supported"
+      }
+    },
+    "config:tokenLifecycle": {
+      "axis": "config",
+      "name": "tokenLifecycle",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:tokenRequest": {
+      "axis": "config",
+      "name": "tokenRequest",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "config:tokenValidation": {
+      "axis": "config",
+      "name": "tokenValidation",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "extra:buildsigninurl": {
+      "axis": "extra",
+      "name": "buildSignInURL",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "missing"
+      }
+    },
+    "extra:continuefederatedauth": {
+      "axis": "extra",
+      "name": "continueFederatedAuth",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "extra:disablehttphandler": {
+      "axis": "extra",
+      "name": "disableHttpHandler",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:enablehttphandler": {
+      "axis": "extra",
+      "name": "enableHttpHandler",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getauthorizerequesturl": {
+      "axis": "extra",
+      "name": "getAuthorizeRequestUrl",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getcrypto": {
+      "axis": "extra",
+      "name": "getCrypto",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getdiscoveryresponse": {
+      "axis": "extra",
+      "name": "getDiscoveryResponse",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getflowmeta": {
+      "axis": "extra",
+      "name": "getFlowMeta",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "missing"
+      }
+    },
+    "extra:gethttpclient": {
+      "axis": "extra",
+      "name": "getHttpClient",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getinstanceid": {
+      "axis": "extra",
+      "name": "getInstanceId",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getobosigninurl": {
+      "axis": "extra",
+      "name": "getOBOSignInURL",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getstoragemanager": {
+      "axis": "extra",
+      "name": "getStorageManager",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:httprequest": {
+      "axis": "extra",
+      "name": "httpRequest",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:httprequestall": {
+      "axis": "extra",
+      "name": "httpRequestAll",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:initiateciba": {
+      "axis": "extra",
+      "name": "initiateCIBA",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:isinitialized": {
+      "axis": "extra",
+      "name": "isInitialized",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:issessionactive": {
+      "axis": "extra",
+      "name": "isSessionActive",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:on": {
+      "axis": "extra",
+      "name": "on",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:performpasskeyauthentication": {
+      "axis": "extra",
+      "name": "performPasskeyAuthentication",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "extra:performpasskeyregistration": {
+      "axis": "extra",
+      "name": "performPasskeyRegistration",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "extra:pollciba": {
+      "axis": "extra",
+      "name": "pollCIBA",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:recover": {
+      "axis": "extra",
+      "name": "recover",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:signinsilently": {
+      "axis": "extra",
+      "name": "signInSilently",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:startautorefreshtoken": {
+      "axis": "extra",
+      "name": "startAutoRefreshToken",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:updateusercredentials": {
+      "axis": "extra",
+      "name": "updateUserCredentials",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "input:BOOLEAN_INPUT": {
+      "axis": "input",
+      "name": "BOOLEAN_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "input:CONSENT_INPUT": {
+      "axis": "input",
+      "name": "CONSENT_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "input:DATE_INPUT": {
+      "axis": "input",
+      "name": "DATE_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:EMAIL_INPUT": {
+      "axis": "input",
+      "name": "EMAIL_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:HIDDEN": {
+      "axis": "input",
+      "name": "HIDDEN",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "input:NUMBER_INPUT": {
+      "axis": "input",
+      "name": "NUMBER_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "input:OTP_INPUT": {
+      "axis": "input",
+      "name": "OTP_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:OU_SELECT": {
+      "axis": "input",
+      "name": "OU_SELECT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:PASSWORD_INPUT": {
+      "axis": "input",
+      "name": "PASSWORD_INPUT",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "input:PHONE_INPUT": {
+      "axis": "input",
+      "name": "PHONE_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:SELECT": {
+      "axis": "input",
+      "name": "SELECT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:TEXT_INPUT": {
+      "axis": "input",
+      "name": "TEXT_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:USER_SELECT": {
+      "axis": "input",
+      "name": "USER_SELECT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "surface:clearSession": {
+      "axis": "surface",
+      "name": "clearSession",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:decodeJwtToken": {
+      "axis": "surface",
+      "name": "decodeJwtToken",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:exchangeToken": {
+      "axis": "surface",
+      "name": "exchangeToken",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:getAccessToken": {
+      "axis": "surface",
+      "name": "getAccessToken",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:getConfiguration": {
+      "axis": "surface",
+      "name": "getConfiguration",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:getUser": {
+      "axis": "surface",
+      "name": "getUser",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:getUserProfile": {
+      "axis": "surface",
+      "name": "getUserProfile",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:getUserSchema": {
+      "axis": "surface",
+      "name": "getUserSchema",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:handleRedirectCallback": {
+      "axis": "surface",
+      "name": "handleRedirectCallback",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "missing"
+      }
+    },
+    "surface:initialize": {
+      "axis": "surface",
+      "name": "initialize",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:isLoading": {
+      "axis": "surface",
+      "name": "isLoading",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:isSignedIn": {
+      "axis": "surface",
+      "name": "isSignedIn",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:reInitialize": {
+      "axis": "surface",
+      "name": "reInitialize",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:setSession": {
+      "axis": "surface",
+      "name": "setSession",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:signIn": {
+      "axis": "surface",
+      "name": "signIn",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:signOut": {
+      "axis": "surface",
+      "name": "signOut",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:signUp": {
+      "axis": "surface",
+      "name": "signUp",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "surface:updateUserProfile": {
+      "axis": "surface",
+      "name": "updateUserProfile",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    }
+  },
+  "generated": "2026-10-05 14:05 UTC",
+  "product": {
+    "branch": "main",
+    "commit": "6f93b18"
+  },
+  "sdks": {
+    "android": "bede1cc",
+    "flutter": "41661a5",
+    "ios": "004ec0b",
+    "javascript": "9b4db5b"
+  }
+}
