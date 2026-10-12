@@ -40,6 +40,16 @@
         "javascript": "supported"
       }
     },
+    "config:backchannelLogout": {
+      "axis": "config",
+      "name": "backchannelLogout",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "config:baseUrl": {
       "axis": "config",
       "name": "baseUrl",
@@ -750,6 +760,16 @@
         "javascript": "supported"
       }
     },
+    "surface:handleBackchannelLogout": {
+      "axis": "surface",
+      "name": "handleBackchannelLogout",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "surface:handleRedirectCallback": {
       "axis": "surface",
       "name": "handleRedirectCallback",
@@ -851,15 +871,15 @@
       }
     }
   },
-  "generated": "2026-10-05 14:05 UTC",
+  "generated": "2026-10-12 14:54 UTC",
   "product": {
     "branch": "main",
-    "commit": "6f93b18"
+    "commit": "e725779"
   },
   "sdks": {
     "android": "bede1cc",
     "flutter": "41661a5",
     "ios": "004ec0b",
-    "javascript": "9b4db5b"
+    "javascript": "d0c6e4e"
   }
 }
