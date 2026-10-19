@@ -200,6 +200,16 @@
         "javascript": "supported"
       }
     },
+    "config:session": {
+      "axis": "config",
+      "name": "session",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "supported",
+        "javascript": "supported"
+      }
+    },
     "config:signInOptions": {
       "axis": "config",
       "name": "signInOptions",
@@ -257,16 +267,6 @@
         "android": "supported",
         "flutter": "supported",
         "ios": "supported",
-        "javascript": "supported"
-      }
-    },
-    "config:syncSession": {
-      "axis": "config",
-      "name": "syncSession",
-      "sdks": {
-        "android": "na",
-        "flutter": "na",
-        "ios": "na",
         "javascript": "supported"
       }
     },
@@ -380,6 +380,16 @@
         "javascript": "missing"
       }
     },
+    "extra:getflows": {
+      "axis": "extra",
+      "name": "getFlows",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "extra:gethttpclient": {
       "axis": "extra",
       "name": "getHttpClient",
@@ -413,6 +423,26 @@
     "extra:getstoragemanager": {
       "axis": "extra",
       "name": "getStorageManager",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getusers": {
+      "axis": "extra",
+      "name": "getUsers",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getusertypes": {
+      "axis": "extra",
+      "name": "getUserTypes",
       "sdks": {
         "android": "missing",
         "flutter": "missing",
@@ -677,7 +707,7 @@
         "android": "missing",
         "flutter": "missing",
         "ios": "missing",
-        "javascript": "missing"
+        "javascript": "supported"
       }
     },
     "surface:clearSession": {
@@ -871,15 +901,15 @@
       }
     }
   },
-  "generated": "2026-10-12 14:54 UTC",
+  "generated": "2026-10-19 12:38 UTC",
   "product": {
     "branch": "main",
-    "commit": "e725779"
+    "commit": "b33a1c7"
   },
   "sdks": {
-    "android": "bede1cc",
-    "flutter": "41661a5",
-    "ios": "004ec0b",
-    "javascript": "d0c6e4e"
+    "android": "7cda421",
+    "flutter": "16ca205",
+    "ios": "9145551",
+    "javascript": "fcd57b6"
   }
 }
