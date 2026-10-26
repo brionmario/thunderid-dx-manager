@@ -95,7 +95,7 @@
       "name": "discovery",
       "sdks": {
         "android": "missing",
-        "flutter": "missing",
+        "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
       }
@@ -105,7 +105,7 @@
       "name": "endpoints",
       "sdks": {
         "android": "supported",
-        "flutter": "missing",
+        "flutter": "supported",
         "ios": "supported",
         "javascript": "supported"
       }
@@ -184,7 +184,7 @@
       "axis": "config",
       "name": "preferences",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
@@ -284,7 +284,7 @@
       "axis": "config",
       "name": "tokenRequest",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
         "ios": "missing",
         "javascript": "supported"
@@ -307,6 +307,16 @@
         "android": "supported",
         "flutter": "supported",
         "ios": "supported",
+        "javascript": "missing"
+      }
+    },
+    "extra:checksession": {
+      "axis": "extra",
+      "name": "checkSession",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
         "javascript": "missing"
       }
     },
@@ -410,6 +420,16 @@
         "javascript": "supported"
       }
     },
+    "extra:getoautherrormessage": {
+      "axis": "extra",
+      "name": "getOAuthErrorMessage",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "extra:getobosigninurl": {
       "axis": "extra",
       "name": "getOBOSignInURL",
@@ -454,8 +474,8 @@
       "axis": "extra",
       "name": "httpRequest",
       "sdks": {
-        "android": "missing",
-        "flutter": "missing",
+        "android": "supported",
+        "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
       }
@@ -476,6 +496,16 @@
       "sdks": {
         "android": "missing",
         "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:isbackendmode": {
+      "axis": "extra",
+      "name": "isBackendMode",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
       }
@@ -560,6 +590,16 @@
         "javascript": "supported"
       }
     },
+    "extra:signinwithredirect": {
+      "axis": "extra",
+      "name": "signInWithRedirect",
+      "sdks": {
+        "android": "missing",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
     "extra:startautorefreshtoken": {
       "axis": "extra",
       "name": "startAutoRefreshToken",
@@ -577,6 +617,26 @@
         "android": "supported",
         "flutter": "supported",
         "ios": "supported",
+        "javascript": "supported"
+      }
+    },
+    "extra:watchsession": {
+      "axis": "extra",
+      "name": "watchSession",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "input:AUTH_FLOW_SELECT": {
+      "axis": "input",
+      "name": "AUTH_FLOW_SELECT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
         "javascript": "supported"
       }
     },
@@ -703,6 +763,16 @@
     "input:USER_SELECT": {
       "axis": "input",
       "name": "USER_SELECT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "input:USER_TYPE_SELECT": {
+      "axis": "input",
+      "name": "USER_TYPE_SELECT",
       "sdks": {
         "android": "missing",
         "flutter": "missing",
@@ -901,15 +971,15 @@
       }
     }
   },
-  "generated": "2026-10-19 12:38 UTC",
+  "generated": "2026-10-26 12:33 UTC",
   "product": {
     "branch": "main",
-    "commit": "b33a1c7"
+    "commit": "3f162db"
   },
   "sdks": {
-    "android": "7cda421",
-    "flutter": "16ca205",
-    "ios": "9145551",
-    "javascript": "fcd57b6"
+    "android": "12cfc19",
+    "flutter": "68e4a11",
+    "ios": "7d300f4",
+    "javascript": "7b0f4a0"
   }
 }
