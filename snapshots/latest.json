@@ -40,6 +40,16 @@
         "javascript": "supported"
       }
     },
+    "config:authorizationDetails": {
+      "axis": "config",
+      "name": "authorizationDetails",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "config:backchannelLogout": {
       "axis": "config",
       "name": "backchannelLogout",
@@ -75,7 +85,7 @@
       "name": "clientSecret",
       "sdks": {
         "android": "supported",
-        "flutter": "missing",
+        "flutter": "supported",
         "ios": "supported",
         "javascript": "supported"
       }
@@ -115,7 +125,7 @@
       "name": "extensions",
       "sdks": {
         "android": "na",
-        "flutter": "missing",
+        "flutter": "supported",
         "ios": "na",
         "javascript": "supported"
       }
@@ -125,8 +135,8 @@
       "name": "grantType",
       "sdks": {
         "android": "missing",
-        "flutter": "missing",
-        "ios": "missing",
+        "flutter": "supported",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -400,6 +410,16 @@
         "javascript": "supported"
       }
     },
+    "extra:getgrantedpermissions": {
+      "axis": "extra",
+      "name": "getGrantedPermissions",
+      "sdks": {
+        "android": "supported",
+        "flutter": "supported",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "extra:gethttpclient": {
       "axis": "extra",
       "name": "getHttpClient",
@@ -530,6 +550,16 @@
         "javascript": "supported"
       }
     },
+    "extra:management": {
+      "axis": "extra",
+      "name": "management",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "extra:on": {
       "axis": "extra",
       "name": "on",
@@ -643,6 +673,16 @@
     "input:BOOLEAN_INPUT": {
       "axis": "input",
       "name": "BOOLEAN_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "input:CONNECTION_SELECT": {
+      "axis": "input",
+      "name": "CONNECTION_SELECT",
       "sdks": {
         "android": "missing",
         "flutter": "missing",
@@ -971,15 +1011,15 @@
       }
     }
   },
-  "generated": "2026-10-26 12:33 UTC",
+  "generated": "2026-11-02 15:12 UTC",
   "product": {
     "branch": "main",
-    "commit": "3f162db"
+    "commit": "14c0b7b"
   },
   "sdks": {
-    "android": "12cfc19",
-    "flutter": "68e4a11",
-    "ios": "7d300f4",
-    "javascript": "7b0f4a0"
+    "android": "5520e12",
+    "flutter": "04a29fb",
+    "ios": "6d19a1a",
+    "javascript": "9e80e29"
   }
 }
