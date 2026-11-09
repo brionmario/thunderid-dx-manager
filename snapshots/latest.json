@@ -44,9 +44,9 @@
       "axis": "config",
       "name": "authorizationDetails",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
-        "ios": "missing",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -104,9 +104,9 @@
       "axis": "config",
       "name": "discovery",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "supported",
-        "ios": "missing",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -360,6 +360,46 @@
         "javascript": "supported"
       }
     },
+    "extra:evaluateaccess": {
+      "axis": "extra",
+      "name": "evaluateAccess",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:evaluateaccesses": {
+      "axis": "extra",
+      "name": "evaluateAccesses",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:executeembeddedselfflow": {
+      "axis": "extra",
+      "name": "executeEmbeddedSelfFlow",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getaccessibleorganizationunits": {
+      "axis": "extra",
+      "name": "getAccessibleOrganizationUnits",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
     "extra:getauthorizerequesturl": {
       "axis": "extra",
       "name": "getAuthorizeRequestUrl",
@@ -375,6 +415,16 @@
       "name": "getCrypto",
       "sdks": {
         "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:getcurrentorganizationunit": {
+      "axis": "extra",
+      "name": "getCurrentOrganizationUnit",
+      "sdks": {
+        "android": "supported",
         "flutter": "missing",
         "ios": "missing",
         "javascript": "supported"
@@ -470,6 +520,26 @@
         "javascript": "supported"
       }
     },
+    "extra:getsupportedauthorizationdetailstype": {
+      "axis": "extra",
+      "name": "getSupportedAuthorizationDetailsType",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "extra:getsupportedauthorizationdetailstypes": {
+      "axis": "extra",
+      "name": "getSupportedAuthorizationDetailsTypes",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
     "extra:getusers": {
       "axis": "extra",
       "name": "getUsers",
@@ -514,7 +584,7 @@
       "axis": "extra",
       "name": "initiateCIBA",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
         "ios": "missing",
         "javascript": "supported"
@@ -594,15 +664,35 @@
       "axis": "extra",
       "name": "pollCIBA",
       "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
+    "extra:polldeviceauthorization": {
+      "axis": "extra",
+      "name": "pollDeviceAuthorization",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "extra:recover": {
+      "axis": "extra",
+      "name": "recover",
+      "sdks": {
         "android": "missing",
         "flutter": "missing",
         "ios": "missing",
         "javascript": "supported"
       }
     },
-    "extra:recover": {
+    "extra:searchactions": {
       "axis": "extra",
-      "name": "recover",
+      "name": "searchActions",
       "sdks": {
         "android": "missing",
         "flutter": "missing",
@@ -640,14 +730,54 @@
         "javascript": "supported"
       }
     },
+    "extra:startdeviceauthorization": {
+      "axis": "extra",
+      "name": "startDeviceAuthorization",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "extra:switchorganizationunit": {
+      "axis": "extra",
+      "name": "switchOrganizationUnit",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "extra:updateusercredentials": {
       "axis": "extra",
       "name": "updateUserCredentials",
       "sdks": {
         "android": "supported",
         "flutter": "supported",
-        "ios": "supported",
+        "ios": "missing",
         "javascript": "supported"
+      }
+    },
+    "extra:verifyattribute": {
+      "axis": "extra",
+      "name": "verifyAttribute",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "extra:verifydevicecode": {
+      "axis": "extra",
+      "name": "verifyDeviceCode",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
       }
     },
     "extra:watchsession": {
@@ -677,7 +807,7 @@
         "android": "missing",
         "flutter": "missing",
         "ios": "missing",
-        "javascript": "missing"
+        "javascript": "supported"
       }
     },
     "input:CONNECTION_SELECT": {
@@ -687,7 +817,7 @@
         "android": "missing",
         "flutter": "missing",
         "ios": "missing",
-        "javascript": "missing"
+        "javascript": "supported"
       }
     },
     "input:CONSENT_INPUT": {
@@ -737,7 +867,7 @@
         "android": "missing",
         "flutter": "supported",
         "ios": "missing",
-        "javascript": "missing"
+        "javascript": "supported"
       }
     },
     "input:OTP_INPUT": {
@@ -746,7 +876,7 @@
       "sdks": {
         "android": "missing",
         "flutter": "missing",
-        "ios": "missing",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -754,9 +884,9 @@
       "axis": "input",
       "name": "OU_SELECT",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
-        "ios": "missing",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -780,13 +910,23 @@
         "javascript": "supported"
       }
     },
-    "input:SELECT": {
+    "input:ROLE_SELECT": {
       "axis": "input",
-      "name": "SELECT",
+      "name": "ROLE_SELECT",
       "sdks": {
         "android": "missing",
         "flutter": "missing",
         "ios": "missing",
+        "javascript": "missing"
+      }
+    },
+    "input:SELECT": {
+      "axis": "input",
+      "name": "SELECT",
+      "sdks": {
+        "android": "supported",
+        "flutter": "missing",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -794,9 +934,9 @@
       "axis": "input",
       "name": "TEXT_INPUT",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "supported",
-        "ios": "missing",
+        "ios": "supported",
         "javascript": "supported"
       }
     },
@@ -876,7 +1016,7 @@
       "sdks": {
         "android": "supported",
         "flutter": "supported",
-        "ios": "supported",
+        "ios": "missing",
         "javascript": "supported"
       }
     },
@@ -886,7 +1026,7 @@
       "sdks": {
         "android": "supported",
         "flutter": "supported",
-        "ios": "supported",
+        "ios": "missing",
         "javascript": "supported"
       }
     },
@@ -896,7 +1036,7 @@
       "sdks": {
         "android": "supported",
         "flutter": "supported",
-        "ios": "supported",
+        "ios": "missing",
         "javascript": "supported"
       }
     },
@@ -966,7 +1106,7 @@
       "sdks": {
         "android": "supported",
         "flutter": "supported",
-        "ios": "supported",
+        "ios": "missing",
         "javascript": "supported"
       }
     },
@@ -1006,20 +1146,20 @@
       "sdks": {
         "android": "supported",
         "flutter": "supported",
-        "ios": "supported",
+        "ios": "missing",
         "javascript": "supported"
       }
     }
   },
-  "generated": "2026-11-02 15:12 UTC",
+  "generated": "2026-11-09 15:41 UTC",
   "product": {
     "branch": "main",
-    "commit": "14c0b7b"
+    "commit": "1d5a86a"
   },
   "sdks": {
-    "android": "5520e12",
-    "flutter": "04a29fb",
-    "ios": "6d19a1a",
-    "javascript": "9e80e29"
+    "android": "12658fc",
+    "flutter": "e0f30b3",
+    "ios": "95dc19d",
+    "javascript": "9c8f417"
   }
 }
