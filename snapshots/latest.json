@@ -610,6 +610,16 @@
         "javascript": "supported"
       }
     },
+    "extra:isouswitchcallback": {
+      "axis": "extra",
+      "name": "isOuSwitchCallback",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "supported"
+      }
+    },
     "extra:issessionactive": {
       "axis": "extra",
       "name": "isSessionActive",
@@ -765,7 +775,7 @@
       "name": "verifyAttribute",
       "sdks": {
         "android": "supported",
-        "flutter": "missing",
+        "flutter": "supported",
         "ios": "missing",
         "javascript": "missing"
       }
@@ -804,7 +814,7 @@
       "axis": "input",
       "name": "BOOLEAN_INPUT",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
         "ios": "missing",
         "javascript": "supported"
@@ -814,7 +824,7 @@
       "axis": "input",
       "name": "CONNECTION_SELECT",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
         "ios": "missing",
         "javascript": "supported"
@@ -834,17 +844,27 @@
       "axis": "input",
       "name": "DATE_INPUT",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "missing",
         "ios": "missing",
         "javascript": "supported"
+      }
+    },
+    "input:DATE_TIME_INPUT": {
+      "axis": "input",
+      "name": "DATE_TIME_INPUT",
+      "sdks": {
+        "android": "missing",
+        "flutter": "missing",
+        "ios": "missing",
+        "javascript": "missing"
       }
     },
     "input:EMAIL_INPUT": {
       "axis": "input",
       "name": "EMAIL_INPUT",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
@@ -864,7 +884,7 @@
       "axis": "input",
       "name": "NUMBER_INPUT",
       "sdks": {
-        "android": "missing",
+        "android": "supported",
         "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
@@ -875,7 +895,7 @@
       "name": "OTP_INPUT",
       "sdks": {
         "android": "missing",
-        "flutter": "missing",
+        "flutter": "supported",
         "ios": "supported",
         "javascript": "supported"
       }
@@ -904,8 +924,8 @@
       "axis": "input",
       "name": "PHONE_INPUT",
       "sdks": {
-        "android": "missing",
-        "flutter": "missing",
+        "android": "supported",
+        "flutter": "supported",
         "ios": "missing",
         "javascript": "supported"
       }
@@ -1151,15 +1171,15 @@
       }
     }
   },
-  "generated": "2026-11-09 15:41 UTC",
+  "generated": "2026-11-16 15:17 UTC",
   "product": {
     "branch": "main",
-    "commit": "1d5a86a"
+    "commit": "0dd781e"
   },
   "sdks": {
-    "android": "12658fc",
-    "flutter": "e0f30b3",
-    "ios": "95dc19d",
-    "javascript": "9c8f417"
+    "android": "cac1ab7",
+    "flutter": "e1ff643",
+    "ios": "ab7ab8c",
+    "javascript": "6d3a776"
   }
 }
